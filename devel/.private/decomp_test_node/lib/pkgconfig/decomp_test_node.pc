@@ -1,8 +1,0 @@
-prefix=/home/tyh/DB_plan_Project/devel/.private/decomp_test_node
-
-Name: decomp_test_node
-Description: Description of decomp_test_node
-Version: 0.0.1
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: roscpp rosbag decomp_ros_utils

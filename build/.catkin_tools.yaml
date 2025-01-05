@@ -1,6 +1,0 @@
-devel_space: /home/tyh/DB_plan_Project/devel
-install: false
-install_space: /home/tyh/DB_plan_Project/install
-profile: default
-source_space: /home/tyh/DB_plan_Project/src
-workspace: /home/tyh/DB_plan_Project

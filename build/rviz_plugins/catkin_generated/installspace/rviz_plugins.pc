@@ -1,8 +1,0 @@
-prefix=/home/tyh/DB_plan_Project/install
-
-Name: rviz_plugins
-Description: Description of rviz_plugins
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

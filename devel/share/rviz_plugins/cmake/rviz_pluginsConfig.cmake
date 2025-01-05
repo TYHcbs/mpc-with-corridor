@@ -1,1 +1,0 @@
-/home/tyh/DB_plan_Project/devel/.private/rviz_plugins/share/rviz_plugins/cmake/rviz_pluginsConfig.cmake

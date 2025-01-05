@@ -1,1 +1,0 @@
-/home/tyh/DB_plan_Project/devel/.private/waypoint_generator/lib/pkgconfig/waypoint_generator.pc

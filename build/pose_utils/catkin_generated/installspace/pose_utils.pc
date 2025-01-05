@@ -1,8 +1,0 @@
-prefix=/home/tyh/DB_plan_Project/install
-
-Name: pose_utils
-Description: Description of pose_utils
-Version: 0.0.0
-Cflags: -I${prefix}/include
-Libs: -L${prefix}/lib -lpose_utils
-Requires: 

@@ -1,1 +1,0 @@
-/home/tyh/DB_plan_Project/devel/.private/quadrotor_msgs/share/roseus/ros/quadrotor_msgs/msg/Gains.l

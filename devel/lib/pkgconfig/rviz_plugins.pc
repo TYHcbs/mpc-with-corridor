@@ -1,1 +1,0 @@
-/home/tyh/DB_plan_Project/devel/.private/rviz_plugins/lib/pkgconfig/rviz_plugins.pc
