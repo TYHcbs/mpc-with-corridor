@@ -1,0 +1,3 @@
+[ 25%] [32mBuilding CXX object CMakeFiles/trajectory_generator_node.dir/src/Astar_searcher.cpp.o[0m
+[ 50%] [32m[1mLinking CXX executable /home/tyh/DB_plan_Project/devel/.private/trajectory_generator/lib/trajectory_generator/trajectory_generator_node[0m
+[100%] Built target trajectory_generator_node

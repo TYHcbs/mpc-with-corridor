@@ -1,0 +1,8 @@
+prefix=/home/tyh/DB_plan_Project/install
+
+Name: traj_server
+Description: Description of traj_server
+Version: 0.0.1
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

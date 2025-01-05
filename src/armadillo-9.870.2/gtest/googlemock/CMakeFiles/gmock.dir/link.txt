@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC   -shared -Wl,-soname,libgmock.so -o ../lib/libgmock.so CMakeFiles/gmock.dir/src/gmock-all.cc.o  -Wl,-rpath,/home/tyh/DB_plan_Project/src/armadillo-9.870.2/gtest/lib ../lib/libgtest.so -lpthread 

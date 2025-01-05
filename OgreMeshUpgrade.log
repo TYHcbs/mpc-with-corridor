@@ -1,0 +1,10 @@
+21:01:44: Creating resource group General
+21:01:44: Creating resource group Internal
+21:01:44: Creating resource group Autodetect
+21:01:44: Registering ResourceManager for type Material
+21:01:44: Registering ResourceManager for type Skeleton
+21:01:44: Registering ResourceManager for type Mesh
+21:01:44: OGRE EXCEPTION(7:InternalErrorException): Unexpected error while reading file /home/tyh/DB_plan_Project/src/read_only/Utils/odom_visualization/meshes/hummingbird_1.mesh in OgreMeshUpgrade at /build/ogre-1.9-kiU5_5/ogre-1.9-1.9.0+dfsg1/Tools/MeshUpgrader/src/main.cpp (line 992)
+21:01:44: Unregistering ResourceManager for type Mesh
+21:01:44: Unregistering ResourceManager for type Skeleton
+21:01:44: Unregistering ResourceManager for type Material

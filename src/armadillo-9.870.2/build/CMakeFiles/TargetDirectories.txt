@@ -1,0 +1,7 @@
+/home/tyh/DB_plan_Project/src/armadillo-9.870.2/build/CMakeFiles/install/strip.dir
+/home/tyh/DB_plan_Project/src/armadillo-9.870.2/build/CMakeFiles/install/local.dir
+/home/tyh/DB_plan_Project/src/armadillo-9.870.2/build/CMakeFiles/install.dir
+/home/tyh/DB_plan_Project/src/armadillo-9.870.2/build/CMakeFiles/list_install_components.dir
+/home/tyh/DB_plan_Project/src/armadillo-9.870.2/build/CMakeFiles/rebuild_cache.dir
+/home/tyh/DB_plan_Project/src/armadillo-9.870.2/build/CMakeFiles/edit_cache.dir
+/home/tyh/DB_plan_Project/src/armadillo-9.870.2/build/CMakeFiles/armadillo.dir

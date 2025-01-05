@@ -1,0 +1,8 @@
+-DROS_BUILD_SHARED_LIBS=1
+-DROS_BUILD_SHARED_LIBS=1
+-DROS_PACKAGE_NAME="rviz_plugins"
+-DROSCONSOLE_BACKEND_LOG4CXX
+-DQT_NO_KEYWORDS
+-o
+/home/tyh/DB_plan_Project/src/armadillo-9.870.2/read_only/Utils/rviz_plugins/src/moc_goal_tool.cpp
+/home/tyh/DB_plan_Project/src/read_only/Utils/rviz_plugins/src/goal_tool.h

@@ -1,0 +1,28 @@
+[01m[K/home/tyh/DB_plan_Project/src/trajectory_generator/src/trajectory_generator_node.cpp:[m[K In function ‘[01m[Kvoid visualizeCorridors(const std::vector<Eigen::Matrix<double, 6, -1> >&)[m[K’:
+[01m[K/home/tyh/DB_plan_Project/src/trajectory_generator/src/trajectory_generator_node.cpp:922:48:[m[K [01;31m[Kerror: [m[Ka function-definition is not allowed here before ‘[01m[K{[m[K’ token
+  922 | void visualizeSubpointcloud(vec_Vec3f& points) [01;31m[K{[m[K
+      |                                                [01;31m[K^[m[K
+[01m[K/home/tyh/DB_plan_Project/src/trajectory_generator/src/trajectory_generator_node.cpp:974:55:[m[K [01;31m[Kerror: [m[Ka function-definition is not allowed here before ‘[01m[K{[m[K’ token
+  974 | void visTrajectory(MatrixXd polyCoeff, VectorXd time) [01;31m[K{[m[K
+      |                                                       [01;31m[K^[m[K
+[01m[K/home/tyh/DB_plan_Project/src/trajectory_generator/src/trajectory_generator_node.cpp:1017:30:[m[K [01;31m[Kerror: [m[Ka function-definition is not allowed here before ‘[01m[K{[m[K’ token
+ 1017 | void visPath(MatrixXd nodes) [01;31m[K{[m[K
+      |                              [01;31m[K^[m[K
+[01m[K/home/tyh/DB_plan_Project/src/trajectory_generator/src/trajectory_generator_node.cpp:1050:31:[m[K [01;31m[Kerror: [m[Ka function-definition is not allowed here before ‘[01m[K{[m[K’ token
+ 1050 | Vector3d getPos(double t_cur) [01;31m[K{[m[K
+      |                               [01;31m[K^[m[K
+[01m[K/home/tyh/DB_plan_Project/src/trajectory_generator/src/trajectory_generator_node.cpp:1065:31:[m[K [01;31m[Kerror: [m[Ka function-definition is not allowed here before ‘[01m[K{[m[K’ token
+ 1065 | Vector3d getVel(double t_cur) [01;31m[K{[m[K
+      |                               [01;31m[K^[m[K
+[01m[K/home/tyh/DB_plan_Project/src/trajectory_generator/src/trajectory_generator_node.cpp:1080:33:[m[K [01;31m[Kerror: [m[Ka function-definition is not allowed here before ‘[01m[K{[m[K’ token
+ 1080 | int main(int argc, char **argv) [01;31m[K{[m[K
+      |                                 [01;31m[K^[m[K
+[01m[K/home/tyh/DB_plan_Project/src/trajectory_generator/src/trajectory_generator_node.cpp:1135:1:[m[K [01;31m[Kerror: [m[Kexpected ‘[01m[K}[m[K’ at end of input
+ 1135 | [01;31m[K}[m[K
+      | [01;31m[K^[m[K
+[01m[K/home/tyh/DB_plan_Project/src/trajectory_generator/src/trajectory_generator_node.cpp:714:85:[m[K [01;36m[Knote: [m[Kto match this ‘[01m[K{[m[K’
+  714 | void visualizeCorridors(const std::vector<Eigen::Matrix<double, 6, -1>>& corridors) [01;36m[K{[m[K
+      |                                                                                     [01;36m[K^[m[K
+make[2]: *** [CMakeFiles/trajectory_generator_node.dir/build.make:76: CMakeFiles/trajectory_generator_node.dir/src/trajectory_generator_node.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:2378: CMakeFiles/trajectory_generator_node.dir/all] Error 2
+make: *** [Makefile:146: all] Error 2

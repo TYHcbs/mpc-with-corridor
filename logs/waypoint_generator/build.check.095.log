@@ -1,0 +1,1 @@
+/usr/local/bin/cmake -S/home/tyh/DB_plan_Project/src/read_only/Utils/waypoint_generator -B/home/tyh/DB_plan_Project/build/waypoint_generator --check-build-system CMakeFiles/Makefile.cmake 0

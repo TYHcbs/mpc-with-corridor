@@ -1,0 +1,5 @@
+Linked: (/home/tyh/DB_plan_Project/devel/.private/so3_control/lib/libso3_control_nodelet.so, /home/tyh/DB_plan_Project/devel/lib/libso3_control_nodelet.so)
+Linked: (/home/tyh/DB_plan_Project/devel/.private/so3_control/lib/libSO3Control.so, /home/tyh/DB_plan_Project/devel/lib/libSO3Control.so)
+Linked: (/home/tyh/DB_plan_Project/devel/.private/so3_control/lib/pkgconfig/so3_control.pc, /home/tyh/DB_plan_Project/devel/lib/pkgconfig/so3_control.pc)
+Linked: (/home/tyh/DB_plan_Project/devel/.private/so3_control/share/so3_control/cmake/so3_controlConfig-version.cmake, /home/tyh/DB_plan_Project/devel/share/so3_control/cmake/so3_controlConfig-version.cmake)
+Linked: (/home/tyh/DB_plan_Project/devel/.private/so3_control/share/so3_control/cmake/so3_controlConfig.cmake, /home/tyh/DB_plan_Project/devel/share/so3_control/cmake/so3_controlConfig.cmake)

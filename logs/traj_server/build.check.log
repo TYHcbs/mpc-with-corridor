@@ -1,0 +1,1 @@
+/usr/local/bin/cmake -S/home/tyh/DB_plan_Project/src/read_only/Utils/traj_server -B/home/tyh/DB_plan_Project/build/traj_server --check-build-system CMakeFiles/Makefile.cmake 0

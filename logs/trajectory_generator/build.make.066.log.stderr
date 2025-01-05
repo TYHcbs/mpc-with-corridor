@@ -1,0 +1,18 @@
+[01m[K/home/tyh/DB_plan_Project/src/trajectory_generator/src/trajectory_generator_node.cpp:[m[K In function ‘[01m[Kvoid visualizeCorridors(const std::vector<Eigen::Matrix<double, 6, -1> >&)[m[K’:
+[01m[K/home/tyh/DB_plan_Project/src/trajectory_generator/src/trajectory_generator_node.cpp:771:33:[m[K [01;31m[Kerror: [m[Kno matching function for call to ‘[01m[KEigen::Matrix<double, 3, 1>::dot(int)[m[K’
+  771 |       point = point-normal.dot(5[01;31m[K)[m[K;
+      |                                 [01;31m[K^[m[K
+In file included from [01m[K/usr/include/eigen3/Eigen/Core:436[m[K,
+                 from [01m[K/usr/include/eigen3/Eigen/StdVector:14[m[K,
+                 from [01m[K/usr/include/pcl-1.10/pcl/point_cloud.h:45[m[K,
+                 from [01m[K/home/tyh/DB_plan_Project/src/trajectory_generator/src/trajectory_generator_node.cpp:10[m[K:
+[01m[K/usr/include/eigen3/Eigen/src/Core/MatrixBase.h:190:5:[m[K [01;36m[Knote: [m[Kcandidate: ‘[01m[Ktemplate<class OtherDerived> typename Eigen::ScalarBinaryOpTraits<typename Eigen::internal::traits<T>::Scalar, typename Eigen::internal::traits<OtherDerived>::Scalar>::ReturnType Eigen::MatrixBase<Derived>::dot(const Eigen::MatrixBase<OtherDerived>&) const [with OtherDerived = OtherDerived; Derived = Eigen::Matrix<double, 3, 1>][m[K’
+  190 |     [01;36m[Kdot[m[K(const MatrixBase<OtherDerived>& other) const;
+      |     [01;36m[K^~~[m[K
+[01m[K/usr/include/eigen3/Eigen/src/Core/MatrixBase.h:190:5:[m[K [01;36m[Knote: [m[K  template argument deduction/substitution failed:
+[01m[K/home/tyh/DB_plan_Project/src/trajectory_generator/src/trajectory_generator_node.cpp:771:33:[m[K [01;36m[Knote: [m[K  mismatched types ‘[01m[Kconst Eigen::MatrixBase<Derived>[m[K’ and ‘[01m[Kint[m[K’
+  771 |       point = point-normal.dot(5[01;36m[K)[m[K;
+      |                                 [01;36m[K^[m[K
+make[2]: *** [CMakeFiles/trajectory_generator_node.dir/build.make:76: CMakeFiles/trajectory_generator_node.dir/src/trajectory_generator_node.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:2378: CMakeFiles/trajectory_generator_node.dir/all] Error 2
+make: *** [Makefile:146: all] Error 2

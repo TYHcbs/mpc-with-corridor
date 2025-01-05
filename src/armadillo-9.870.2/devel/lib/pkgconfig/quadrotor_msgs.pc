@@ -1,0 +1,8 @@
+prefix=/home/tyh/DB_plan_Project/src/armadillo-9.870.2/devel
+
+Name: quadrotor_msgs
+Description: Description of quadrotor_msgs
+Version: 0.0.0
+Cflags: -I/home/tyh/DB_plan_Project/src/armadillo-9.870.2/devel/include
+Libs: -L${prefix}/lib -lencode_msgs -ldecode_msgs
+Requires: message_runtime

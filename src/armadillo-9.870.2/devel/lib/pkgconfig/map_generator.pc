@@ -1,0 +1,8 @@
+prefix=/home/tyh/DB_plan_Project/src/armadillo-9.870.2/devel
+
+Name: map_generator
+Description: Description of map_generator
+Version: 0.0.1
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

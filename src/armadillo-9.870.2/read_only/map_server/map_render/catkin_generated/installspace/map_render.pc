@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: map_render
+Description: Description of map_render
+Version: 0.1.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: roscpp roslib pcl_ros

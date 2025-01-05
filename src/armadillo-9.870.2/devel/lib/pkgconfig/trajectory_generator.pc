@@ -1,0 +1,8 @@
+prefix=/home/tyh/DB_plan_Project/src/armadillo-9.870.2/devel
+
+Name: trajectory_generator
+Description: Description of trajectory_generator
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

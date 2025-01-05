@@ -1,0 +1,8 @@
+prefix=/home/tyh/DB_plan_Project/src/armadillo-9.870.2/devel
+
+Name: so3_quadrotor_simulator
+Description: Description of so3_quadrotor_simulator
+Version: 0.0.0
+Cflags: -I/home/tyh/DB_plan_Project/src/read_only/quadrotor_simulator/so3_quadrotor_simulator/include
+Libs: -L${prefix}/lib 
+Requires: roscpp quadrotor_msgs

@@ -1,0 +1,1 @@
+/home/tyh/DB_plan_Project/devel/.private/traj_server/lib/pkgconfig/traj_server.pc

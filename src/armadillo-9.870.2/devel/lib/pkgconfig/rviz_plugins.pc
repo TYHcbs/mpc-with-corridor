@@ -1,0 +1,8 @@
+prefix=/home/tyh/DB_plan_Project/src/armadillo-9.870.2/devel
+
+Name: rviz_plugins
+Description: Description of rviz_plugins
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

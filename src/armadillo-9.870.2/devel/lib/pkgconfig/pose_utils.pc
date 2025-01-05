@@ -1,0 +1,8 @@
+prefix=/home/tyh/DB_plan_Project/src/armadillo-9.870.2/devel
+
+Name: pose_utils
+Description: Description of pose_utils
+Version: 0.0.0
+Cflags: -I/home/tyh/DB_plan_Project/src/read_only/Utils/pose_utils/include
+Libs: -L${prefix}/lib -lpose_utils
+Requires: 

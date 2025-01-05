@@ -1,0 +1,1 @@
+/home/tyh/DB_plan_Project/devel/.private/quadrotor_msgs/share/quadrotor_msgs/cmake/quadrotor_msgsConfig.cmake

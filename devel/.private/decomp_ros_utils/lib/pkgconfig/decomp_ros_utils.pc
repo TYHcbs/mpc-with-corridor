@@ -1,0 +1,8 @@
+prefix=/home/tyh/DB_plan_Project/devel/.private/decomp_ros_utils
+
+Name: decomp_ros_utils
+Description: Description of decomp_ros_utils
+Version: 0.0.0
+Cflags: -I/home/tyh/DB_plan_Project/src/read_only/Utils/DecompROS/decomp_ros_utils/include
+Libs: -L${prefix}/lib -ldecomp_rviz_plugins
+Requires: roscpp rviz decomp_ros_msgs
