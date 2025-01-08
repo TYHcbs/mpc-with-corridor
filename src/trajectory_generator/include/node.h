@@ -7,7 +7,7 @@
 #include <Eigen/Eigen>
 #include "backward.hpp"
 
-#define inf 1>>20
+#define INF 1>>20
 struct GridNode;
 typedef GridNode* GridNodePtr; // selfadd: ???
 
@@ -28,8 +28,8 @@ struct GridNode
 		coord = _coord;
 		dir   = Eigen::Vector3i::Zero();
 
-		gScore = inf;
-		fScore = inf;
+		gScore = INF;
+		fScore = INF;
 		cameFrom = NULL;
     }
 

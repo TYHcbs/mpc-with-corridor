@@ -1,8 +1,8 @@
 <launch>
 
-<arg name="map_size_x" default="30.0"/>
-<arg name="map_size_y" default="30.0"/>
-<arg name="map_size_z" default="4.0"/>
+<arg name="map_size_x" default="30"/><!--30-->
+<arg name="map_size_y" default="30"/><!--30-->
+<arg name="map_size_z" default="4.0"/><!--4.0-->
 <arg name="map_frame_name"  default="world"/>
 
 <arg name="start_x" default=" -15.0"/>
@@ -14,32 +14,36 @@
 <arg name="estimation_rate"  default="30.0"/>
 
   <!-- Trajectory Optimization -->
-  <node pkg="trajectory_generator" type="trajectory_generator_node" name="trajectory_generator_node" output="screen" required = "true">
-      <remap from="~goal"        to="/waypoint_generator/waypoints"/>
-      <remap from="~local_pointcloud" to="/pcl_render_node/local_pointcloud"/> 
-      <remap from="~odom"             to="/visual_slam/odom"/> 
+  <node pkg="trajectory_generator" type="mpc_node" name="mpc_node" output="screen" required = "true">
+      <remap from="goal"             to="/waypoint_generator/waypoints"/>
+      <remap from="local_pointcloud" to="/pcl_render_node/local_pointcloud"/> 
+      <remap from="odom"             to="/visual_slam/odom"/> 
+      <remap from="imu"              to="sim/imu"/> 
       <param name="planning/vel_u"                value="1.0"  />  <!--modified 3.0-->  
       <param name="planning/vel_l"                value="-1.0"  /> <!--modified 3.0-->
       <param name="planning/acc_l"                value="10.0"  /> <!--modified 2.0-->
       <param name="planning/acc_u"                value="-10.0"  /> <!--modified 2.0-->
-      <param name="planning/dev_order"          value="4"    />
+      <!-- <param name="planning/dev_order"          value="4"    />
       <param name="planning/min_order"          value="3"    />
-      <param name="vis/vis_traj_width"          value="0.07" />
+      <param name="vis/vis_traj_width"          value="0.07" /> -->
       <param name="map/margin"                  value="0.0" />
       <param name="map/resolution"              value="0.2" />
-      <param name="map/x_size"                  value="$(arg map_size_x)"/>
+      <param name="map/x_size"                  value="$(arg map_size_x)"/> <!--"$(arg map_size_x)"-->
       <param name="map/y_size"                  value="$(arg map_size_y)"/>
       <param name="map/z_size"                  value="$(arg map_size_z)"/>
-      <param name="replanning/thresh_replan"    value="1.5" type="double"/>
-      <param name="replanning/thresh_no_replan" value="2.0" type="double"/>
-      <param name="path/resolution"             value="0.2"/> 
 
+      <param name="local_x_size"                  value="0.5"/>
+      <param name="local_y_size"                  value="0.5"/>
+      <param name="local_z_size"                  value="0.5"/>
+      <!-- <param name="replanning/thresh_replan"    value="1.5" type="double"/> -->
+      <!-- <param name="replanning/thresh_no_replan" value="2.0" type="double"/> -->
+      <param name="map/resolution"             value="0.1"/> 
   </node>
      
   <!-- Trajectory Command server -->
   <node pkg="traj_server" type="traj_server_node" name="traj_server" output="screen" launch-prefix="">
-        <remap from="~/odometry" to="/visual_slam/odom"/>
-        <remap from="~/trajectory" to="/mpc_node/mpc_path"/><!--mpc_node/mpc_path --> <!--modified,origin: "/trajectory_generator_node/trajectory"-->
+        <!--<remap from="~/odometry" to="/visual_slam/odom"/>-->
+        <!--<remap from="~/trajectory" to="/mpc_node/mpc_path"/>--> <!--mpc_node/mpc_path -->  <!--modified,origin: "/trajectory_generator_node/trajectory"-->
   </node>
 
 <!-- Random Map Generator -->
@@ -99,7 +103,7 @@
    <!-- Quadrotor Controller -->  
    <node pkg="nodelet" type="nodelet" args="standalone so3_control/SO3ControlNodelet" name="so3_control" required="true" output="screen">
      <remap from="~odom"          to="/visual_slam/odom"/>
-     <remap from="~position_cmd"  to="/traj_server/position_command"/> <!--planner_cmd-->
+     <remap from="~position_cmd"  to="/mpc_node/planner_cmd"/> <!--/traj_server/position_command-->
      <remap from="~motors"        to="motors"/>
      <remap from="~corrections"   to="corrections"/>
      <remap from="~so3_cmd"       to="so3_cmd"/>

@@ -29,6 +29,7 @@ find_package(catkin REQUIRED COMPONENTS
   decomp_ros_utils # modified
   # decomp_util # modified
   decomp_ros_msgs
+  rosfmt
 )
 
 
@@ -48,13 +49,13 @@ include_directories(
     ${PCL_INCLUDE_DIRS} 
 )
 
-add_executable(trajectory_generator_node
-	src/trajectory_generator_node.cpp
-	src/trajectory_generator_waypoint.cpp
+add_executable(mpc_node
+  src/planner.cpp
+  src/mpc.cpp
   src/Astar_searcher.cpp
 )
 
-target_link_libraries(trajectory_generator_node
+target_link_libraries(mpc_node
    ${catkin_LIBRARIES}
    ${PCL_LIBRARIES}
    osqp::osqp # selfadded #PUBLIC ?

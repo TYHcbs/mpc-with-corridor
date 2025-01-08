@@ -1,7 +1,0 @@
-[01m[K/home/tyh/DB_plan_Project/src/trajectory_generator/src/trajectory_generator_node.cpp:[m[K In function ‘[01m[KEigen::VectorXd timeAllocation(Eigen::MatrixXd)[m[K’:
-[01m[K/home/tyh/DB_plan_Project/src/trajectory_generator/src/trajectory_generator_node.cpp:681:5:[m[K [01;31m[Kerror: [m[Kreturn-statement with no value, in function returning ‘[01m[KEigen::VectorXd[m[K’ {aka ‘[01m[KEigen::Matrix<double, -1, 1>[m[K’} [[01;31m[K-fpermissive[m[K]
-  681 |     [01;31m[Kreturn[m[K;
-      |     [01;31m[K^~~~~~[m[K
-make[2]: *** [CMakeFiles/trajectory_generator_node.dir/build.make:76: CMakeFiles/trajectory_generator_node.dir/src/trajectory_generator_node.cpp.o] Error 1
-make[1]: *** [CMakeFiles/Makefile2:2378: CMakeFiles/trajectory_generator_node.dir/all] Error 2
-make: *** [Makefile:146: all] Error 2

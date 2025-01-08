@@ -86,8 +86,6 @@ class IOSQP {
     pSettings->eps_abs = eps_abs;
     pSettings->eps_rel = eps_rel;
     // selfadd following : set before osqp_setup
-    pSettings->eps_abs = eps_abs;
-    pSettings->eps_rel = eps_rel;
     pSettings->verbose = 1;            // 打印求解过程
     pSettings->max_iter = 10000;       // 最大迭代次数
     pSettings->polish = 1;             // 使用polish

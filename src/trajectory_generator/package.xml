@@ -6,9 +6,9 @@
      trajectory_generator
 
   </description>
-  <maintainer email="fgaoaa@connect.ust.hk">Fei Gao</maintainer>
+  <maintainer email="tianyhlife@outlook.com">Tyh</maintainer>
   <license>BSD</license>
-  <url>http://ros.org/wiki/waypoint_generator</url>
+  <!-- <url>http://ros.org/wiki/waypoint_generator</url> -->
 
   <buildtool_depend>catkin</buildtool_depend>
 

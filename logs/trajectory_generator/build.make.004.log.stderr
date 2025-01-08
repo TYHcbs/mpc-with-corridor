@@ -1,6 +1,0 @@
-/usr/bin/ld: CMakeFiles/trajectory_generator_node.dir/src/trajectory_generator_node.cpp.o: in function `trajOptimization(Eigen::Matrix<double, -1, -1, 0, -1, -1>, std::vector<Eigen::Matrix<double, 3, 1, 0, 3, 1>, std::allocator<Eigen::Matrix<double, 3, 1, 0, 3, 1> > >, std::vector<Eigen::Matrix<double, 3, 1, 0, 3, 1>, Eigen::aligned_allocator<Eigen::Matrix<double, 3, 1, 0, 3, 1> > >)':
-trajectory_generator_node.cpp:(.text+0x3472): undefined reference to `getSubPointClouds(pcl::PointCloud<pcl::PointXYZ> const&, std::vector<Eigen::Matrix<double, 3, 1, 0, 3, 1>, std::allocator<Eigen::Matrix<double, 3, 1, 0, 3, 1> > > const&)'
-collect2: error: ld returned 1 exit status
-make[2]: *** [CMakeFiles/trajectory_generator_node.dir/build.make:271: /home/tyh/DB_plan_Project/devel/.private/trajectory_generator/lib/trajectory_generator/trajectory_generator_node] Error 1
-make[1]: *** [CMakeFiles/Makefile2:2378: CMakeFiles/trajectory_generator_node.dir/all] Error 2
-make: *** [Makefile:146: all] Error 2

@@ -3,84 +3,138 @@
 using namespace std;
 using namespace Eigen;
 
-void AstarPathFinder::initGridMap(double _resolution, Vector3d global_xyz_l,
-                                  Vector3d global_xyz_u, int max_x_id,
-                                  int max_y_id, int max_z_id) {
+void AstarPathFinder::initValue(double _resolution, Eigen::Vector3d local_xyz_l,
+                                  Eigen::Vector3d local_xyz_u, Eigen::Vector3d global_xyz_l,
+                                  Eigen::Vector3d global_xyz_u,int local_max_x_id,
+                                  int local_max_y_id, int local_max_z_id, 
+                                  int global_max_x_id, int global_max_y_id, int global_max_z_id) {
+  lc_xl = local_xyz_l(0);
+  lc_yl = local_xyz_l(1);
+  lc_zl = local_xyz_l(2);
+
+  lc_xu = local_xyz_u(0);
+  lc_yu = local_xyz_u(1);
+  lc_zu = local_xyz_u(2);
+
   gl_xl = global_xyz_l(0);
   gl_yl = global_xyz_l(1);
   gl_zl = global_xyz_l(2);
-
   gl_xu = global_xyz_u(0);
   gl_yu = global_xyz_u(1);
   gl_zu = global_xyz_u(2);
 
-  GLX_SIZE = max_x_id;
-  GLY_SIZE = max_y_id;
-  GLZ_SIZE = max_z_id;
+  GLX_SIZE = local_max_x_id;//!!! //for local map size
+  GLY_SIZE = local_max_y_id;
+  GLZ_SIZE = local_max_z_id;
   GLYZ_SIZE = GLY_SIZE * GLZ_SIZE;
   GLXYZ_SIZE = GLX_SIZE * GLYZ_SIZE;
+
+  GLX_SIZE_GLB = global_max_x_id;
+  GLY_SIZE_GLB = global_max_y_id;
+  GLZ_SIZE_GLB = global_max_z_id;
 
   resolution = _resolution;
   inv_resolution = 1.0 / _resolution;
 
+  // std::cout<<"lc_xl_temp = "<<lc_xl_temp<<std::endl;
+  // std::cout<<"lc_xu_temp = "<<lc_xu_temp<<std::endl;
+  // std::cout<<"lc_yl_temp = "<<lc_xl_temp<<std::endl;
+  // std::cout<<"lc_yu_temp = "<<lc_xl_temp<<std::endl;
+  // std::cout<<"lc_zl_temp = "<<lc_xl_temp<<std::endl;
+  // std::cout<<"lc_zu_temp = "<<lc_xl_temp<<std::endl;
+
+  std::cout<<"GLX_SIZE = "<<GLX_SIZE<<std::endl;
+  std::cout<<"GLY_SIZE = "<<GLY_SIZE<<std::endl;
+  std::cout<<"GLZ_SIZE = "<<GLZ_SIZE<<std::endl;
+  std::cout<<"resolution = "<<resolution<<std::endl;
+}
+
+
+void AstarPathFinder::initGridMap(){
+  // std::cout<<"Inside initGridMap" << std::endl;
   data = new uint8_t[GLXYZ_SIZE];
+  // std::cout<<"inside initGridMap, after data = xxxx" << std::endl;
   memset(data, 0, GLXYZ_SIZE * sizeof(uint8_t));
+  // std::cout<<"inside initGridMap, after memset(xxx)" << std::endl;
 
   GridNodeMap = new GridNodePtr **[GLX_SIZE];
+  // std::cout<<"inside initGridMap, after GridNodeMap initialize " << std::endl;
+  // std::cout<<"GLX_SIZE, GLY_SIZE, GLZ_SIZE:  "<<GLX_SIZE<<", "<<GLY_SIZE<<", "<<GLZ_SIZE<<std::endl;
   for (int i = 0; i < GLX_SIZE; i++) {
     GridNodeMap[i] = new GridNodePtr *[GLY_SIZE];
     for (int j = 0; j < GLY_SIZE; j++) {
       GridNodeMap[i][j] = new GridNodePtr[GLZ_SIZE]; //selfadd:???
       for (int k = 0; k < GLZ_SIZE; k++) {
-        Vector3i tmpIdx(i, j, k);
-        Vector3d pos = gridIndex2coord(tmpIdx);
+        Eigen::Vector3i tmpIdx(i,j,k);
+        Eigen::Vector3d pos = gridIndex2coord(tmpIdx);
+        // std::cout<<"inside initGridMap, after gridIndex2coord " << std::endl;
+        // std::cout<<"tmpIdx: "<< tmpIdx.transpose() << std::endl;
         GridNodeMap[i][j][k] = new GridNode(tmpIdx, pos);
       }
     }
   }
+  // std::cout<<"End of initGridMap, after for loop " << std::endl;
 }
+
 
 void AstarPathFinder::resetGrid(GridNodePtr ptr) {
   ptr->id = 0;
   ptr->cameFrom = NULL;
-  ptr->gScore = inf;
-  ptr->fScore = inf;
+  ptr->gScore = INF;
+  ptr->fScore = INF;
 }
 
 void AstarPathFinder::resetUsedGrids() {
-  for (int i = 0; i < GLX_SIZE; i++)
-    for (int j = 0; j < GLY_SIZE; j++)
-      for (int k = 0; k < GLZ_SIZE; k++)
+  ROS_INFO("[!] Start resetUsedGrids,GLX_SIZE,GLY_SIZE,GLZ_SIZE= %d, %d, %d",GLX_SIZE,GLY_SIZE,GLZ_SIZE);
+  for (int i = 0; i < GLX_SIZE; i++){
+    for (int j = 0; j < GLY_SIZE; j++){
+      for (int k = 0; k < GLZ_SIZE; k++){
+        ROS_INFO("Local map Index =%d, %d, %d", i, j, k);  
         resetGrid(GridNodeMap[i][j][k]);
+      }
+    }
+  }
+  ROS_INFO("[Debug] resetUsedGrids() Ends.");
 }
 
 void AstarPathFinder::setObs(const double coord_x, const double coord_y,
-                             const double coord_z) {
+              const double coord_z) {
   if (coord_x < gl_xl || coord_y < gl_yl || coord_z < gl_zl ||
-      coord_x >= gl_xu || coord_y >= gl_yu || coord_z >= gl_zu)
+    coord_x >= gl_xu || coord_y >= gl_yu || coord_z >= gl_zu)
     return;
+  // //index in global map
+  // int idx_x = static_cast<int>((coord_x - gl_xl) * inv_resolution);//!!??
+  // int idx_y = static_cast<int>((coord_y - gl_yl) * inv_resolution);
+  // int idx_z = static_cast<int>((coord_z - gl_zl) * inv_resolution);
 
-  int idx_x = static_cast<int>((coord_x - gl_xl) * inv_resolution);
-  int idx_y = static_cast<int>((coord_y - gl_yl) * inv_resolution);
-  int idx_z = static_cast<int>((coord_z - gl_zl) * inv_resolution);
+  // //index in local map
+  // int idx_x_local_mid = idx_x-center_idx_x;
+  // int idx_y_local_mid = idx_y-center_idx_y;
+  // int idx_z_local_mid = idx_z-center_idx_z;a
+  Vector3i idx_pt;
+  Vector3d coord_pt(coord_x,coord_y,coord_z);
+  idx_pt = coord2gridIndex(coord_pt);
+  data[idx_pt(0) * GLYZ_SIZE + idx_pt(1) * GLZ_SIZE + idx_pt(2)] = 1;
+}
 
-  if (idx_x == 0 || idx_y == 0 || idx_z == GLZ_SIZE || idx_x == GLX_SIZE ||
-      idx_y == GLY_SIZE)
-    data[idx_x * GLYZ_SIZE + idx_y * GLZ_SIZE + idx_z] = 1;
-  else {
-    data[idx_x * GLYZ_SIZE + idx_y * GLZ_SIZE + idx_z] = 1;
-    int inflate_size = 4;  // 膨胀大小
-    for(int i = -inflate_size; i <= inflate_size; i++){
-        for(int j = -inflate_size; j <= inflate_size; j++){
-            int x_number = idx_x + i;
-            int y_number = idx_y + j;
-            if(x_number >=0  && x_number < GLX_SIZE && 
-               y_number >=0 && y_number < GLY_SIZE){
-                data[x_number * GLYZ_SIZE + y_number * GLZ_SIZE + idx_z] = 1;
-            }
-        }
+void AstarPathFinder::setObsVector(std::vector<Eigen::Vector3d> &cloud, double radius) {
+  memset(data, 0, GLXYZ_SIZE*sizeof(uint8_t));//!!
+
+  for (int i = 0; i < cloud.size(); i++) {
+    Eigen::Vector3d new_pt;
+    new_pt = cloud[i];
+    if (coorIsInMap(new_pt) == false) continue;
+    // new_pt << cloud[i].x(), cloud[i].y(), resolution*2;
+    // bool flag = CheckPoint(new_pt);
+    // flag = false;
+    for (double x = -radius; x <= radius; x += resolution) {
+      for (double y = -radius; y <= radius; y += resolution) {
+        // if (flag == false) {
+          for (double z = -radius; z <= radius; z += resolution) {
+            setObs(cloud[i].x()+x, cloud[i].y()+y, cloud[i].z()+z);
+          }
+      }
     }
-
   }
 }
 
@@ -102,19 +156,21 @@ vector<Vector3d> AstarPathFinder::getVisitedNodes() {
 
 Vector3d AstarPathFinder::gridIndex2coord(const Vector3i &index) {
   Vector3d pt;
-
-  pt(0) = ((double)index(0) + 0.5) * resolution + gl_xl;
-  pt(1) = ((double)index(1) + 0.5) * resolution + gl_yl;
-  pt(2) = ((double)index(2) + 0.5) * resolution + gl_zl;
-
+  // index in data -> cordinate in global sys
+  pt(0) = ((double)index(0) + 0.5) * resolution + lc_xl;
+  pt(1) = ((double)index(1) + 0.5) * resolution + lc_yl;
+  pt(2) = ((double)index(2) + 0.5) * resolution + lc_zl;
+  pt += center_;// added
   return pt;
 }
 
 Vector3i AstarPathFinder::coord2gridIndex(const Vector3d &pt) {
+  // index in data -> cordinate in global sys
   Vector3i idx;
-  idx << min(max(int((pt(0) - gl_xl) * inv_resolution), 0), GLX_SIZE - 1),
-      min(max(int((pt(1) - gl_yl) * inv_resolution), 0), GLY_SIZE - 1),
-      min(max(int((pt(2) - gl_zl) * inv_resolution), 0), GLZ_SIZE - 1);
+  Eigen::Vector3d error_pt = pt - center_;
+  idx << min(max(int((error_pt(0) - lc_xl) * inv_resolution), 0), GLX_SIZE - 1),
+      min(max(int((error_pt(1) - lc_yl) * inv_resolution), 0), GLY_SIZE - 1),
+      min(max(int((error_pt(2) - lc_zl) * inv_resolution), 0), GLZ_SIZE - 1);
 
   return idx;
 }
@@ -470,11 +526,11 @@ int AstarPathFinder::safeCheck(MatrixXd polyCoeff, VectorXd time) {
               //     vel += i * polyCoeff.block<3,1>(seg*3, i) * pow(t, i-1);
               // }
           }
-          int idx_x = static_cast<int>((pos.x() - gl_xl) * inv_resolution);
-          int idx_y = static_cast<int>((pos.y() - gl_yl) * inv_resolution);
-          int idx_z = static_cast<int>((pos.z() - gl_zl) * inv_resolution);
+          // int idx_x = static_cast<int>((pos.x() - gl_xl) * inv_resolution); //index in global sys
+          // int idx_y = static_cast<int>((pos.y() - gl_yl) * inv_resolution);
+          // int idx_z = static_cast<int>((pos.z() - gl_zl) * inv_resolution);
           // Check position bounds
-          if(!isFree(idx_x,idx_y,idx_z)) {
+          if(!isFree(pos.x(),pos.y(),pos.z())) {
               unsafe_segment = seg;
               std::cout<<"Find unsafe_segment!: "<<unsafe_segment<<std::endl;
               return unsafe_segment;
@@ -492,4 +548,27 @@ int AstarPathFinder::safeCheck(MatrixXd polyCoeff, VectorXd time) {
   }
 
   return unsafe_segment;
+}
+
+void AstarPathFinder::FloydHandle(const std::vector<Eigen::Vector3d>& astar_path, 
+                                    std::vector<Eigen::Vector3d>& waypoint)
+{
+  waypoint.clear();
+  waypoint = pathSimplify(astar_path, 0.2);
+  // std::cout << "simplify size:" << waypoint.size() << std::endl;
+
+  // generate Floyd path(twice for optimal trajectory)
+  for(int time = 0; time < 2; time++){
+    for(int i = waypoint.size()-1; i > 0; i--){
+      for(int j = 0; j < i-1; j++){
+        if(AstarPathFinder::CheckLineObstacleFree(waypoint[i], waypoint[j]) == true){
+          for(int k = i-1; k > j; k--) {
+            waypoint.erase(waypoint.begin()+k); // delete redundant inflection points
+          }
+          i = j;
+          break;
+        }
+      }
+    }
+  }
 }

@@ -232,7 +232,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "pcl_render");
     ros::NodeHandle nh("~");
 
-    nh.getParam("sensing_horizon", sensing_horizon);
+    nh.getParam("sensing_horizon", sensing_horizon);//!!!
     nh.getParam("sensing_rate", sensing_rate);
     nh.getParam("estimation_rate", estimation_rate);
 

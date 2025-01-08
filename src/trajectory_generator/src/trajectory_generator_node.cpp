@@ -23,6 +23,7 @@
 #include "Astar_searcher.h"
 #include "backward.hpp"
 #include "trajectory_generator_waypoint.h"
+#include "mpc.h"
 
 #include "decomp_ros_utils/data_ros_utils.h"
 #include "decomp_util/ellipsoid_decomp.h"
