@@ -68,12 +68,12 @@ void PlannerClass::TimerCallback(const ros::TimerEvent &)
         }
         if (replan_flag_) {
             replan_flag_ = false;
-            PathReplan(true);
+            PathReplan(false);
         }
         else {
             new_goal_flag_ = false;
             replan_flag_ = false;
-            PathReplan(false);
+            PathReplan(true);
         }
 
         log_times_[1] = (ros::Time::now() - t_start).toSec() * 1000.0;
@@ -163,22 +163,23 @@ void PlannerClass::TimerCallback(const ros::TimerEvent &)
             //     }
             // }
             // std::cout<<" before mpc_goals_.clear()"<<std::endl;
+
             // MPC set goal
             mpc_goals_.clear();
             Eigen::Vector3d last_p_ref;
+            ROS_INFO(" mpc_->MPC_HORIZON: %d, ref_dis_ = %d, mpc_->MPC_STEP = %.3f", mpc_->MPC_HORIZON,ref_dis_,mpc_->MPC_STEP);
             for (int i = 0; i < mpc_->MPC_HORIZON; i++) {
                 int index = astar_index_ + i * ref_dis_;
-                if (index >= goal_in_sfc) index = goal_in_sfc;
+                // if (index >= goal_in_sfc) index = goal_in_sfc;
                 if (index >= follow_path_.size()) index = follow_path_.size() - 1;
                 Eigen::Vector3d v_r(0, 0, 0);
                 if (i == 0) v_r = (follow_path_[index] - odom_p_) / mpc_->MPC_STEP;
                 else if (i == mpc_->MPC_HORIZON) v_r.setZero();
                 else v_r = (follow_path_[index] - last_p_ref) / mpc_->MPC_STEP;
                 last_p_ref = follow_path_[index];
-                // std::cout<<"[Debug] in mpc goal,follow_path_[index] =  \n"<<follow_path_[index]<<std::endl;
                 mpc_->SetGoal(follow_path_[index], v_r, Eigen::Vector3d::Zero(), i);
-                // std::cout << "mpc goal " << i << ": " << follow_path_[index].transpose() << " v: " << v_r.transpose() << std::endl;
                 mpc_goals_.push_back(follow_path_[index]);
+                std::cout<<"Index: "<< index <<", mpc_goals_.push_back: \n"<<follow_path_[index]<<std::endl;
             }
             AstarPublish(mpc_goals_, 3, 0.1);
 
@@ -196,17 +197,17 @@ void PlannerClass::TimerCallback(const ros::TimerEvent &)
         log_times_[2] = (ros::Time::now() - sfc_start).toSec() * 1000.0;
     }
 
-    if (mode_ == Hover) {
-        for (int i = 0; i < mpc_->MPC_HORIZON; i++) {
-            mpc_->SetGoal(goal_p_, Eigen::Vector3d::Zero(), Eigen::Vector3d::Zero(), i);
-        }
-    }
-    // std::cout<<"[YES]*************** before MPC!*********"<<std::endl;
+    // if (mode_ == Hover) {
+    //     for (int i = 0; i < mpc_->MPC_HORIZON; i++) {
+    //         mpc_->SetGoal(goal_p_, Eigen::Vector3d::Zero(), Eigen::Vector3d::Zero(), i);
+    //     }
+    // }
+    ROS_INFO("[YES]*************** before MPC solving!*********");
     // calculate model predict control algorithm
     ros::Time mpc_start = ros::Time::now();
     mpc_->SetStatus(odom_p_, odom_v_, odom_a_);
     bool success_flag = mpc_->Run();
-    // std::cout<<"[Debug] MPC success_flag : "<<success_flag<<std::endl;
+    std::cout<<"[Debug] MPC success_flag : "<<success_flag<<std::endl;
     log_times_[3] = (ros::Time::now() - mpc_start).toSec() * 1000.0;
 
     Eigen::Vector3d u_optimal, p_optimal, v_optimal, a_optimal, u_predict;
@@ -216,8 +217,16 @@ void PlannerClass::TimerCallback(const ros::TimerEvent &)
         last_mpc_time_ = ros::Time::now();
         for (int i = 0; i <= ctrl_delay_*10/mpc_->MPC_STEP; i++) {
             mpc_->GetOptimCmd(u_optimal, i);
+            // std::cout << "[Debug]index: " << i << ", u_optimal: \n" << u_optimal<< std::endl;
             mpc_->SystemModel(A1, B1, mpc_->MPC_STEP);
             x_optimal = A1 * x_optimal + B1 * u_optimal;
+            // std::cout << "[Debug] A1: \n" << A1 << std::endl;
+            // std::cout << "[Debug] B1: \n" << B1 <<std::endl;
+            // std::cout << "[Debug]index: " << i << ", x_optimal: \n" << x_optimal<< std::endl;
+            // 打印每一步的状态和输入
+            std::cout << "Step " << i << std::endl;
+            std::cout << "State: " << x_optimal.transpose() << std::endl;
+            std::cout << "Input: " << u_optimal.transpose() << std::endl;
         }
         // std::cout<<"[Debug] MPC x_optimal: \n"<< x_optimal <<std::endl;
         mpc_ctrl_index_ = ctrl_delay_/mpc_->MPC_STEP;
@@ -226,6 +235,7 @@ void PlannerClass::TimerCallback(const ros::TimerEvent &)
         v_optimal << x_optimal(3,0), x_optimal(4,0), x_optimal(5,0);
         a_optimal << x_optimal(6,0), x_optimal(7,0), x_optimal(8,0);
         // std::cout<<"[Debug]p_optimal: \n"<<p_optimal<<std::endl;
+        
         // if (!perfect_simu_flag_) CmdPublish(odom_p_, v_optimal, a_optimal, u_optimal);
         // else CmdPublish(p_optimal, v_optimal, a_optimal, u_optimal);//!!!!
         CmdPublish(p_optimal, v_optimal, a_optimal, u_optimal);//!!!!
@@ -342,30 +352,33 @@ void PlannerClass::PathReplan(bool extend)//!!!会不会少a* init
     // start_p = odom_p_ + odom_v_ * 0.1;
     // std::cout << "after start_p = odom_p_;" << std::endl;
     if (extend) {
-        local_astar_->SetCenter(Eigen::Vector3d(odom_p_.x(), odom_p_.y(), 0.0));
+        // local_astar_->SetCenter(Eigen::Vector3d(odom_p_.x(), odom_p_.y(), 0.0));
         // std::cout << "after local_astar_->SetCenter(xxx)" << std::endl;
-        local_astar_->initGridMap();
-        // std::cout << "********************after local_astar_->initGridMap();*****************" << std::endl;
+        // local_astar_->initGridMap();
+        std::cout << "********************after local_astar_->initGridMap();*****************" << std::endl;
     } else {
         // ROS_WARN("[MPC FSM]: Replan!");
         std::cout<<"extend = "<< extend << " (in else)"<<std::endl;
     }
-    // std::cout << "*************before local_astar_->setObsVector(local_pc_, expand_dyn_);***************" << std::endl;
+    std::cout << "*************before local_astar_->setObsVector(local_pc_, expand_dyn_);***************" << std::endl;
     local_astar_->setObsVector(local_pc_, expand_dyn_);
 
     bool add_goal_flag = false;
     end_p = goal_p_;
+    std::cout<<"-------[Debug] end_p before process: \n"<< end_p<< std::endl;
     // std::cout<<"[YES]******start_p = \n"<<start_p<<"end_p= \n"<<end_p<<std::endl;
     double delta_x = goal_p_.x() - odom_p_.x();
     double delta_y = goal_p_.y() - odom_p_.y();
-    if (std::fabs(delta_x) > map_upp_.x() || std::fabs(delta_y) > map_upp_.y()) {
+    if (std::fabs(delta_x) > local_map_upp_.x() || std::fabs(delta_y) > local_map_upp_.y()) {
         add_goal_flag = true;
         if (std::fabs(delta_x) > std::fabs(delta_y)) {
-            end_p.x() = odom_p_.x() + (delta_x/std::fabs(delta_x)) * (map_upp_.x() - resolution_);
-            end_p.y() = odom_p_.y() + ((map_upp_.x() - resolution_)/std::fabs(delta_x)) * delta_y;
+            std::cout<<"delta_x = "<<delta_x<<", local_map_upp_.x()= "<<local_map_upp_.x()<<", resolution_ = "<<resolution_<<std::endl;
+            end_p.x() = odom_p_.x() + (delta_x/std::fabs(delta_x)) * (local_map_upp_.x() - resolution_);
+            end_p.y() = odom_p_.y() + ((local_map_upp_.x() - resolution_)/std::fabs(delta_x)) * delta_y;
         } else {
-            end_p.x() = odom_p_.x() + ((map_upp_.y() - resolution_)/std::fabs(delta_y)) * delta_x;
-            end_p.y() = odom_p_.y() + (delta_y/std::fabs(delta_y)) * (map_upp_.y() - resolution_);
+            std::cout<<"delta_y = "<<delta_x<<", local_map_upp_.y()= "<<local_map_upp_.y()<<", resolution_ = "<<resolution_<<std::endl;
+            end_p.x() = odom_p_.x() + ((local_map_upp_.y() - resolution_)/std::fabs(delta_y)) * delta_x;
+            end_p.y() = odom_p_.y() + (delta_y/std::fabs(delta_y)) * (local_map_upp_.y() - resolution_);
         }
     }
     // start_p.z() = end_p.z(); // only for 2d path searching
@@ -420,18 +433,27 @@ void PlannerClass::PathReplan(bool extend)//!!!会不会少a* init
         }
     }
 
-    std::cout<<"***[YES]Start astar search,\nstart_p = "<<start_p.x()<<", "<<start_p.y()<<", "<<start_p.z()<<",\n end_p =\n"<<end_p<<std::endl;
+    std::cout<<"***[YES]Start astar search,\nstart_p = "<<start_p.x()<<", "<<start_p.y()<<", "<<start_p.z()<<",\n ----[Debug] end_p After process=\n"<<end_p<<std::endl;
     local_astar_->AstarGraphSearch(start_p, end_p);
     bool search_flag = true;
     if (search_flag) {
         auto astar_path_ =local_astar_->getPath();
-        std::cout<<"astar_path_ 1st point: "<<astar_path_[0]<<std::endl;
+        // std::cout<<"astar_path_ 1st point: "<<astar_path_[0]<<std::endl;
+        ROS_INFO("[Debug] astar_path_ after GetPath: total %ld points: ",astar_path_.size());
+        for(int i=0;i<astar_path_.size();i++){
+            std::cout<<astar_path_[i]<<std::endl;
+        }
         AstarPublish(astar_path_, 0, 0.1);
         std::cout<<"After AstarPublish "<<std::endl;
         waypoints_ =local_astar_->pathSimplify(astar_path_, _path_resolution);
+        ROS_INFO("[Debug] waypoints_ after pathSimplify: total %ld points",waypoints_.size());
+        for(int i=0;i<waypoints_.size();i++){
+            std::cout<<waypoints_[i]<<std::endl;
+        }
         std::cout<<"After pathSimplify "<<std::endl;
         // local_astar_->FloydHandle(astar_path_, waypoints_);//
         // waypoints_.insert(waypoints_.begin(), odom_p_);
+        add_goal_flag = false;//for test, change it back!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         if (add_goal_flag && local_astar_->CheckPoint(goal_p_)) waypoints_.push_back(goal_p_);
         AstarPublish(waypoints_, 1, 0.1);
 
@@ -444,6 +466,11 @@ void PlannerClass::PathReplan(bool extend)//!!!会不会少a* init
             }
         }
         follow_path_.push_back(waypoints_.back());
+        ROS_INFO("[Debug] follow_path_ after insert points: total %ld points",follow_path_.size());
+        for(int i=0;i<follow_path_.size();i++){
+            std::cout<<follow_path_[i]<<std::endl;
+        }
+
         std::cout<<"After Insert points, follow_path_ formation done. "<<std::endl;
         AstarPublish(follow_path_, 2, path_dis_);
     } else {
@@ -483,7 +510,7 @@ void PlannerClass::GoalCallback(const nav_msgs::Path::ConstPtr& msg)// modified,
     if (last_goal != new_goal && mode_ == Command) {
         // goal_p_ << msg->pose.position.x, msg->pose.position.y, goal_p_.z(); // 2d path searching
         goal_p_ << msg->poses[0].pose.position.x, msg->poses[0].pose.position.y, msg->poses[0].pose.position.z;
-        if (goal_p_.z() > map_upp_.z() - 0.5) goal_p_.z() = map_upp_.z() - 0.5;
+        if (goal_p_.z() > global_map_upp_.z() - 0.5) goal_p_.z() = global_map_upp_.z() - 0.5;
         if (goal_p_.z() < 0.5) goal_p_.z() = 0.5;
         new_goal_flag_ = true;
     }
@@ -540,8 +567,8 @@ void PlannerClass::LocalPcCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
     static_cloud_.reset(new pcl::PointCloud<pcl::PointXYZ>());
     for (int i = 0; i < vec_cloud_.size(); i++) *static_cloud_ += vec_cloud_[i];
     pcl::CropBox<pcl::PointXYZ> cb; // CropBox filter (delete unuseful points)
-    cb.setMin(Eigen::Vector4f(odom_p_.x() - (map_upp_.x()-0.5), odom_p_.y() - (map_upp_.y()-0.5), 0.2, 1.0)); //其中 w=1.0 通常表示这是一个点（point）而不是方向向量。在齐次坐标系统中：//当 w=1.0 时，表示空间中的一个点 //当 w=0.0 时，表示一个方向向量
-    cb.setMax(Eigen::Vector4f(odom_p_.x() + (map_upp_.x()-0.5), odom_p_.y() + (map_upp_.y()-0.5), map_upp_.z(), 1.0));
+    cb.setMin(Eigen::Vector4f(odom_p_.x() - (local_map_upp_.x()-0.5), odom_p_.y() - (local_map_upp_.y()-0.5), 0.2, 1.0)); //其中 w=1.0 通常表示这是一个点（point）而不是方向向量。在齐次坐标系统中：//当 w=1.0 时，表示空间中的一个点 //当 w=0.0 时，表示一个方向向量
+    cb.setMax(Eigen::Vector4f(odom_p_.x() + (local_map_upp_.x()-0.5), odom_p_.y() + (local_map_upp_.y()-0.5), local_map_upp_.z(), 1.0));
     cb.setInputCloud(static_cloud_);
     cb.filter(*static_cloud_);
     pcl::VoxelGrid<pcl::PointXYZ> vf;

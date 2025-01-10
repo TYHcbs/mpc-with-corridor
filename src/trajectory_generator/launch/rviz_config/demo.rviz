@@ -8,6 +8,7 @@ Panels:
         - /Map1
         - /Map1/global_map1
         - /PolyhedronArray1
+        - /Path1
       Splitter Ratio: 0.6090225577354431
     Tree Height: 854
   - Class: rviz/Selection
@@ -171,8 +172,8 @@ Visualization Manager:
         - Alpha: 1
           Autocompute Intensity Bounds: true
           Autocompute Value Bounds:
-            Max Value: 2.826000213623047
-            Min Value: 0.22599999606609344
+            Max Value: 1.3259999752044678
+            Min Value: -0.20000000298023224
             Value: true
           Axis: Z
           Channel Name: intensity
@@ -226,6 +227,38 @@ Visualization Manager:
       Value: true
       VsColor: 0; 255; 0
       VsScale: 1
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /astar_path
+      Name: Marker
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
+    - Alpha: 1
+      Buffer Length: 1
+      Class: rviz/Path
+      Color: 85; 255; 255
+      Enabled: true
+      Head Diameter: 0.30000001192092896
+      Head Length: 0.20000000298023224
+      Length: 0.30000001192092896
+      Line Style: Lines
+      Line Width: 0.029999999329447746
+      Name: Path
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Pose Color: 255; 85; 255
+      Pose Style: None
+      Queue Size: 10
+      Radius: 0.029999999329447746
+      Shaft Diameter: 0.10000000149011612
+      Shaft Length: 0.10000000149011612
+      Topic: /mpc_path
+      Unreliable: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 255; 255; 127
@@ -342,5 +375,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1908
-  X: 1920
-  Y: 0
+  X: 1888
+  Y: -32

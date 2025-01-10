@@ -84,6 +84,7 @@ class AstarPathFinder
 		void setObsVector(std::vector<Eigen::Vector3d> &cloud, double radius = 0.2);
 
 		void SetCenter(Eigen::Vector3d center) {
+			ROS_INFO("In Setcenter");
 			center_ = center;
 			// //center index in global map
 			// int center_idx_x = static_cast<int>((center_(0) - lc_xl) * inv_resolution);

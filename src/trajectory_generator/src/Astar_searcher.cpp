@@ -45,20 +45,18 @@ void AstarPathFinder::initValue(double _resolution, Eigen::Vector3d local_xyz_l,
 
   std::cout<<"GLX_SIZE = "<<GLX_SIZE<<std::endl;
   std::cout<<"GLY_SIZE = "<<GLY_SIZE<<std::endl;
-  std::cout<<"GLZ_SIZE = "<<GLZ_SIZE<<std::endl;
-  std::cout<<"resolution = "<<resolution<<std::endl;
+  std::cout<<"GLZ_SIZE = "<<GLZ_SIZE<<std::endl; 
 }
 
-
 void AstarPathFinder::initGridMap(){
-  // std::cout<<"Inside initGridMap" << std::endl;
+  std::cout<<"Inside initGridMap" << std::endl;
   data = new uint8_t[GLXYZ_SIZE];
-  // std::cout<<"inside initGridMap, after data = xxxx" << std::endl;
+  std::cout<<"inside initGridMap, after data = xxxx" << std::endl;
   memset(data, 0, GLXYZ_SIZE * sizeof(uint8_t));
-  // std::cout<<"inside initGridMap, after memset(xxx)" << std::endl;
+  std::cout<<"inside initGridMap, after memset(xxx)" << std::endl;
 
   GridNodeMap = new GridNodePtr **[GLX_SIZE];
-  // std::cout<<"inside initGridMap, after GridNodeMap initialize " << std::endl;
+  std::cout<<"inside initGridMap, after GridNodeMap initialize " << std::endl;
   // std::cout<<"GLX_SIZE, GLY_SIZE, GLZ_SIZE:  "<<GLX_SIZE<<", "<<GLY_SIZE<<", "<<GLZ_SIZE<<std::endl;
   for (int i = 0; i < GLX_SIZE; i++) {
     GridNodeMap[i] = new GridNodePtr *[GLY_SIZE];
@@ -73,7 +71,7 @@ void AstarPathFinder::initGridMap(){
       }
     }
   }
-  // std::cout<<"End of initGridMap, after for loop " << std::endl;
+  std::cout<<"End of initGridMap, after for loop " << std::endl;
 }
 
 
@@ -288,20 +286,28 @@ double AstarPathFinder::getHeu(GridNodePtr node1, GridNodePtr node2) {
 void AstarPathFinder::AstarGraphSearch(Vector3d start_pt, Vector3d end_pt) {
   ros::Time time_1 = ros::Time::now();
   cout <<"***start Astar graph search***"<< endl; // for test
+  ROS_INFO("map size: %3fm ~ %3fm , center: %3f,%3f,%3f ,Index: GLX_SIZE,GLY_SIZE,GLZ_SIZE: %d, %d, %d",lc_xl,lc_xu,
+      center_(0),center_(1),center_(2),
+      GLX_SIZE,GLX_SIZE,GLX_SIZE);
+
   // index of start_point and end_point
   Vector3i start_idx = coord2gridIndex(start_pt);
   Vector3i end_idx = coord2gridIndex(end_pt);
   goalIdx = end_idx;
+  std::cout<<"after coord2indx"<<std::endl;
 
   // position of start_point and end_point
   start_pt = gridIndex2coord(start_idx);
   end_pt = gridIndex2coord(end_idx);
+  std::cout<<"after indx2coord"<<std::endl;
 
   // Initialize the pointers of struct GridNode which represent start node and
   // goal node
   GridNodePtr startPtr = new GridNode(start_idx, start_pt);
   GridNodePtr endPtr = new GridNode(end_idx, end_pt);
+  std::cout<<"after  startPtr,endPtr GridNode"<<std::endl;
 
+  std::cout<<"start search, openset clear"<<std::endl;
   // openSet is the open_list implemented through multimap in STL library
   openSet.clear();
   // currentPtr represents the node with lowest f(n) in the open_list
@@ -319,6 +325,7 @@ void AstarPathFinder::AstarGraphSearch(Vector3d start_pt, Vector3d end_pt) {
   startPtr->id = 1;
   startPtr->coord = start_pt; // start_pt:Vector3d
   openSet.insert(make_pair(startPtr->fScore, startPtr));
+  std::cout<<"openSet.insert(make_pair(startPtr->fScore, startPtr))"<<std::endl;
 
   /**
    *
@@ -393,6 +400,7 @@ void AstarPathFinder::AstarGraphSearch(Vector3d start_pt, Vector3d end_pt) {
   if ((time_2 - time_1).toSec() > 0.1)
     ROS_WARN("Time consume in Astar path finding is %f",
              (time_2 - time_1).toSec());
+  
 }
 
 vector<Vector3d> AstarPathFinder::getPath() { //所以在Astarpathsearcher中生成的node实体不会消失是吗
@@ -413,7 +421,9 @@ vector<Vector3d> AstarPathFinder::getPath() { //所以在Astarpathsearcher中生
       
   reverse(path.begin(),path.end());
 
-
+  ROS_INFO("map size: %3fm ~ %3fm , center: %3f,%3f,%3f ,Index: GLX_SIZE,GLY_SIZE,GLZ_SIZE: %d, %d, %d",lc_xl,lc_xu,
+        center_(0),center_(1),center_(2),
+        GLX_SIZE,GLX_SIZE,GLX_SIZE);
   return path;
 }
 

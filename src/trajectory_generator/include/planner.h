@@ -71,8 +71,8 @@ public:
         nh.param("/mpc_node/goal_y", goal_p_.y(), 0.0);
         nh.param("/mpc_node/goal_z", goal_p_.z(), 1.0);
         nh.param("map/resolution", resolution_, 0.1);
-        nh.param("local_x_size", local_map_size.x(), 2.0);//cordinate
-        nh.param("local_y_size", local_map_size.y(), 2.0);
+        nh.param("local_x_size", local_map_size.x(), 4.0);//cordinate
+        nh.param("local_y_size", local_map_size.y(), 4.0);
         nh.param("local_z_size", local_map_size.z(), 2.0);
         nh.param("map/x_size", global_map_size.x(), 30.0);
         nh.param("map/y_size", global_map_size.y(), 30.0);
@@ -80,7 +80,7 @@ public:
 
         nh.param("/mpc_node/astar/expand_dyn", expand_dyn_, 0.25);
         nh.param("/mpc_node/astar/expand_fix", expand_fix_, 0.25);
-        nh.param("/mpc_node/fsm/ref_dis", ref_dis_, 2); //1
+        nh.param("/mpc_node/fsm/ref_dis", ref_dis_, 1); //1
         nh.param("/mpc_node/fsm/path_dis", path_dis_, 0.2);//0.1
         nh.param("path/resolution", _path_resolution, 0.05);
 
@@ -116,6 +116,7 @@ public:
         mpc_   = std::make_shared<MPC_Class>(nh);
         local_astar_ = std::make_shared<AstarPathFinder>();//???make_shared?
         local_astar_->initValue(resolution_, local_map_low_, local_map_upp_,global_map_low_,global_map_upp_,local_max_x_id, local_max_y_id, local_max_z_id, global_max_x_id, global_max_y_id, global_max_z_id);
+        // local_astar_->initGridMap();
         // local_astar_->InitMap(resolution_, Eigen::Vector3d(-5, -5, 0), Eigen::Vector3d(5, 5, 3));
 
         // ros topic

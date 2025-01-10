@@ -19,25 +19,24 @@
       <remap from="local_pointcloud" to="/pcl_render_node/local_pointcloud"/> 
       <remap from="odom"             to="/visual_slam/odom"/> 
       <remap from="imu"              to="sim/imu"/> 
-      <param name="planning/vel_u"                value="1.0"  />  <!--modified 3.0-->  
-      <param name="planning/vel_l"                value="-1.0"  /> <!--modified 3.0-->
-      <param name="planning/acc_l"                value="10.0"  /> <!--modified 2.0-->
-      <param name="planning/acc_u"                value="-10.0"  /> <!--modified 2.0-->
+      <param name="planning/vel_u"                value="3.0"  />  <!--modified 3.0-->  
+      <param name="planning/vel_l"                value="-3.0"  /> <!--modified 3.0-->
+      <param name="planning/acc_l"                value="30.0"  /> <!--modified 2.0-->
+      <param name="planning/acc_u"                value="-30.0"  /> <!--modified 2.0-->
       <!-- <param name="planning/dev_order"          value="4"    />
       <param name="planning/min_order"          value="3"    />
       <param name="vis/vis_traj_width"          value="0.07" /> -->
       <param name="map/margin"                  value="0.0" />
-      <param name="map/resolution"              value="0.2" />
+      <param name="map/resolution"              value="0.1" />
       <param name="map/x_size"                  value="$(arg map_size_x)"/> <!--"$(arg map_size_x)"-->
       <param name="map/y_size"                  value="$(arg map_size_y)"/>
       <param name="map/z_size"                  value="$(arg map_size_z)"/>
 
-      <param name="local_x_size"                  value="0.5"/>
-      <param name="local_y_size"                  value="0.5"/>
-      <param name="local_z_size"                  value="0.5"/>
+      <param name="local_x_size"                  value="2"/>
+      <param name="local_y_size"                  value="2"/>
+      <param name="local_z_size"                  value="2"/>
       <!-- <param name="replanning/thresh_replan"    value="1.5" type="double"/> -->
       <!-- <param name="replanning/thresh_no_replan" value="2.0" type="double"/> -->
-      <param name="map/resolution"             value="0.1"/> 
   </node>
      
   <!-- Trajectory Command server -->

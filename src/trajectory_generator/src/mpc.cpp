@@ -4,8 +4,18 @@ bool MPC_Class::Run(void)
 {
     ros::Time time_0 = ros::Time::now();
 
+    std::cout << "Matrix dimensions:" << std::endl;
+    std::cout << "M: " << mpc_.M.rows() << "x" << mpc_.M.cols() << std::endl;
+    std::cout << "C: " << mpc_.C.rows() << "x" << mpc_.C.cols() << std::endl;
+    std::cout << "H: " << mpc_.H.rows() << "x" << mpc_.H.cols() << std::endl;
+    std::cout << "f: " << mpc_.f.rows() << "x" << mpc_.f.cols() << std::endl;
+
+    std::cout << "Initial state: " << X_0_.transpose() << std::endl;
+    std::cout << "Reference trajectory first point: " << X_r_.block<9,1>(0,0).transpose() << std::endl;
+
     // update reference
     LinearTerm(mpc_, X_0_, X_r_);
+    // std::cout<<"X_r_: \n"<<X_r_<<std::endl;
 
     // update system status and their constraints
     UpdateBound(mpc_, X_0_);
@@ -13,6 +23,7 @@ bool MPC_Class::Run(void)
     // update safe flight corridor constraints
     bool add_sfc_flag = true;
     if (mpc_.T.rows() == 0) add_sfc_flag = false;
+    add_sfc_flag = false;//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!for test, remember to change back TODO!
     if (add_sfc_flag) {
         mpc_.A_sfc.resize(mpc_.T.rows(), mpc_.A_p.cols());
         mpc_.A_sfc_upp.resize(mpc_.D_T.rows(), 1);
@@ -64,7 +75,7 @@ bool MPC_Class::Run(void)
     // solver.data()->setLinearConstraintsMatrix(mpc_.A_sparse);
     // solver.data()->setLowerBound(mpc_.Alow);
     // solver.data()->setUpperBound(mpc_.Aupp);
-    solver.setMats(mpc_.H_sparse, mpc_.f, mpc_.A_sparse, mpc_.Alow, mpc_.Aupp,1e-3,1e-3);
+    solver.setMats(mpc_.H_sparse, mpc_.f, mpc_.A_sparse, mpc_.Alow, mpc_.Aupp,1e-4,1e-4);
 
     // bool init_flag = solver.initSolver();
     bool init_flag = true;
@@ -79,7 +90,7 @@ bool MPC_Class::Run(void)
     fps_++;
     if (solve_flag == true && init_flag == true) {
         mpc_.u_optimal = solver.getPrimalSol();//modified,origin: solver.getSolution();
-        // std::cout<<"**********[Debug!] mpc_.u_optimal: "<<mpc_.u_optimal<<std::endl;
+        std::cout<<"**********[Debug!] mpc_.u_optimal: "<<mpc_.u_optimal<<std::endl;
         static double vel_max = 0.0;
         if (vel_max < X_0_.block(3,0,3,1).norm()) vel_max = X_0_.block(3,0,3,1).norm();
         if ((ros::Time::now()-print_time_).toSec() > 2.0) {
@@ -150,7 +161,7 @@ void MPC_Class::ProblemFormation(void)
     /* system status: {p1, v1, a1, p2, v2, a2, ... , pN, vN, aN} 
        input: {u0, u1, u2, ... , u(N-1)}
     */
-
+    ROS_INFO("---In MPC_Class::ProblemFormation---");
     // system model
     SystemModel(mpc_.Ax, mpc_.Bx, MPC_STEP);
     MPCModel(mpc_.Ax, mpc_.Bx, mpc_.M, mpc_.C);
@@ -162,7 +173,7 @@ void MPC_Class::ProblemFormation(void)
     Q.block(6, 6, 3, 3) = Eigen::Matrix3d::Identity() * R_a_;
     Eigen::MatrixXd R = Eigen::MatrixXd(3, 3).setIdentity() * R_u_;
     Eigen::MatrixXd R_con = Eigen::MatrixXd(3, 3).setIdentity() * R_u_con_;
-    Eigen::MatrixXd F = Eigen::MatrixXd(9, 9).setZero();
+    Eigen::MatrixXd F = Eigen::MatrixXd(9, 9).setZero();//???
     F.block(0, 0, 3, 3) = Eigen::Matrix3d::Identity() * R_pN_;
     F.block(3, 3, 3, 3) = Eigen::Matrix3d::Identity() * R_vN_;
     F.block(6, 6, 3, 3) = Eigen::Matrix3d::Identity() * R_aN_;
@@ -200,6 +211,7 @@ void MPC_Class::SystemModel(Eigen::MatrixXd& A, Eigen::MatrixXd& B, double t)
 void MPC_Class::MPCModel(const Eigen::MatrixXd& A, const Eigen::MatrixXd& B, 
                                Eigen::MatrixXd& M, Eigen::MatrixXd& C)
 {
+    ROS_INFO("-----Attention!--- in MPCModel");
     M.resize(MPC_HORIZON * A.rows(), A.cols());
     M.setZero();
     C.resize(MPC_HORIZON * B.rows(), MPC_HORIZON * B.cols());
@@ -218,6 +230,9 @@ void MPC_Class::MPCModel(const Eigen::MatrixXd& A, const Eigen::MatrixXd& B,
         temp = temp * A;
         M.block(A.rows() * i, 0, A.rows(), A.cols()) = temp;
     }
+    ROS_INFO("-----Attention!---MPC MatrixS: ");
+    std::cout<<"[Debug] M: \n"<< M <<std::endl;
+    std::cout<<"[Debug] C: \n"<< C <<std::endl;
 }
 
 void MPC_Class::QuadraticTerm(mpc_osqp_t& mpc, const Eigen::MatrixXd& Q, const Eigen::MatrixXd& R, 
@@ -235,7 +250,7 @@ void MPC_Class::QuadraticTerm(mpc_osqp_t& mpc, const Eigen::MatrixXd& Q, const E
         if (i == 0) mpc.R_con_bar.block(0, 0, R_con.rows(), R_con.cols()) = R_con;
         else if (i == MPC_HORIZON - 1) {
             mpc.R_con_bar.block(i * R_con.rows(), i * R_con.cols(), R_con.rows(), R_con.cols()) = R_con;
-            mpc.R_con_bar.block(i * R_con.rows(), (i-1) * R_con.cols(), R_con.rows(), R_con.cols()) = -2 * R_con;
+            mpc.R_con_bar.block(i * R_con.rows(), (i-1) * R_con.cols(), R_con.rows(), R_con.cols()) = -2 * R_con;//???
         } else {
             mpc.R_con_bar.block(i * R_con.rows(), i * R_con.cols(), R_con.rows(), R_con.cols()) = 2 * R_con;
             mpc.R_con_bar.block(i * R_con.rows(), (i-1) * R_con.cols(), R_con.rows(), R_con.cols()) = -2 * R_con;
@@ -243,8 +258,13 @@ void MPC_Class::QuadraticTerm(mpc_osqp_t& mpc, const Eigen::MatrixXd& Q, const E
     }
     mpc.Q_bar.block((MPC_HORIZON-1) * Q.rows(), (MPC_HORIZON-1) * Q.cols(), F.rows(), F.cols()) = F;
 
-    mpc.H.resize(mpc.C.rows(), mpc.C.cols());
+    mpc.H.resize(mpc.C.cols(), mpc.C.cols());//modified,origin: mpc.H.resize(mpc.C.rows(), mpc.C.cols());
     mpc.H = mpc.C.transpose() * mpc.Q_bar * mpc.C + mpc.R_bar + mpc.R_con_bar;
+
+    // 添加debug输出
+    std::cout << "Q_bar size: " << mpc.Q_bar.rows() << "x" << mpc.Q_bar.cols() << std::endl;
+    std::cout << "R_bar size: " << mpc.R_bar.rows() << "x" << mpc.R_bar.cols() << std::endl;
+    std::cout << "First few values of Q_bar:\n" << mpc.Q_bar.topLeftCorner(3,3) << std::endl;
 }
 
 void MPC_Class::LinearTerm(mpc_osqp_t& mpc, const Eigen::VectorXd& x_0, const Eigen::VectorXd& x_r)
@@ -253,7 +273,7 @@ void MPC_Class::LinearTerm(mpc_osqp_t& mpc, const Eigen::VectorXd& x_0, const Ei
         ROS_ERROR("[MPC]: MPC linear term set goal error!");
         return;
     }
-    mpc.f.resize(mpc.C.rows(), 1);
+    mpc.f.resize(mpc.C.cols(), 1);//modified,origin: mpc.C.rows()
     mpc.f = ((x_0.transpose()*mpc.M.transpose() - x_r.transpose()) * mpc.Q_bar * mpc.C).transpose();
 }
 
