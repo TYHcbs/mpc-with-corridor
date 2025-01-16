@@ -8,7 +8,12 @@ Panels:
         - /Map1
         - /Map1/global_map1
         - /PolyhedronArray1
-        - /Path1
+        - /astar_path1
+        - /mpc_path1
+        - /local_map_bound1
+        - /astar_obstacles1
+        - /astar_search_region1
+        - /astar_visited1
       Splitter Ratio: 0.6090225577354431
     Tree Height: 854
   - Class: rviz/Selection
@@ -228,13 +233,13 @@ Visualization Manager:
       VsColor: 0; 255; 0
       VsScale: 1
     - Class: rviz/Marker
-      Enabled: true
+      Enabled: false
       Marker Topic: /astar_path
-      Name: Marker
+      Name: astar_path
       Namespaces:
         {}
       Queue Size: 100
-      Value: true
+      Value: false
     - Alpha: 1
       Buffer Length: 1
       Class: rviz/Path
@@ -245,7 +250,7 @@ Visualization Manager:
       Length: 0.30000001192092896
       Line Style: Lines
       Line Width: 0.029999999329447746
-      Name: Path
+      Name: mpc_path
       Offset:
         X: 0
         Y: 0
@@ -258,6 +263,46 @@ Visualization Manager:
       Shaft Length: 0.10000000149011612
       Topic: /mpc_path
       Unreliable: false
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /astar/local_map_bound
+      Name: local_map_bound
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /astar/obstacles
+      Name: astar_obstacles
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /astar/search_region
+      Name: astar_search_region
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /astar/visited
+      Name: astar_visited
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /astar/start_end_points
+      Name: start_end_point
+      Namespaces:
+        {}
+      Queue Size: 100
       Value: true
   Enabled: true
   Global Options:
@@ -277,7 +322,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 53.9142951965332
+      Distance: 46.4232292175293
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -285,17 +330,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 6.783856391906738
-        Y: -0.8164060115814209
-        Z: -6.51368522644043
+        X: -0.7573012709617615
+        Y: 10.722214698791504
+        Z: -6.1816816329956055
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.0847960710525513
+      Pitch: 0.7447963953018188
       Target Frame: <Fixed Frame>
-      Yaw: 3.8079936504364014
+      Yaw: 4.097994804382324
     Saved:
       - Class: rviz/Orbit
         Distance: 79.24484252929688
@@ -375,5 +420,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1908
-  X: 1888
+  X: -32
   Y: -32

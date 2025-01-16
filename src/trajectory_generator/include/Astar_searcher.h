@@ -7,11 +7,59 @@
 #include <Eigen/Eigen>
 #include "backward.hpp"
 #include "node.h"
+#include <mutex>
+
+#include <visualization_msgs/Marker.h>
+#include <visualization_msgs/MarkerArray.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/Point.h>
+
+// #include <opencv2/core/core.hpp>
+// #include <opencv2/core/types.hpp>
+// #include <opencv2/core/mat.hpp>
+
+// // 在所有 OpenCV 头文件之前添加
+// namespace cv {
+//     class Mat;
+//     class InputArray;
+//     class OutputArray;
+//     class InputOutputArray;
+//     class InputArrayOfArrays;
+//     class OutputArrayOfArrays;
+//     struct Size;
+//     struct Point;
+//     struct Rect;
+//     class TermCriteria;
+// }
+
+// #include <opencv2/opencv.hpp>
+// #include <opencv2/highgui/highgui.hpp>
+// #include <opencv2/imgproc/imgproc.hpp>
 
 
 class AstarPathFinder
 {	
 	private:
+		// 添加新的publishers
+		ros::Publisher map_vis_pub_;        // 显示local地图范围
+		ros::Publisher obstacle_vis_pub_;    // 显示障碍物格子
+		ros::Publisher visited_vis_pub_;     // 显示已访问的格子
+		ros::Publisher search_region_pub_;   // 显示搜索范围
+		ros::Publisher start_end_vis_pub_;    // 用于可视化起点和终点
+
+		std::mutex astar_mutex;
+
+		// cv::Mat vis_img_;
+		// int img_width_, img_height_;
+		// double vis_resolution_;  // pixels per meter
+
+		// // Convert world coordinates to image coordinates
+		// cv::Point World2Img(const Eigen::Vector3d& pos) {
+		// 	Eigen::Vector3d relative_pos = pos - center_;
+		// 	int img_x = static_cast<int>((relative_pos.x() - lc_xl) * vis_resolution_ + img_width_/2);
+		// 	int img_y = static_cast<int>(img_height_ - ((relative_pos.y() - gl_yl) * vis_resolution_ + img_height_/2));
+		// 	return cv::Point(img_x, img_y);
+		// }
 
 	protected:
 		uint8_t * data;
@@ -59,18 +107,20 @@ class AstarPathFinder
     	int inflation_cells_;
 
 	public:
-		AstarPathFinder(){};
+		AstarPathFinder(){
+			// 其他初始化代码
+    		// Init2DVisualization();
+		};
 		~AstarPathFinder(){};
-		void AstarGraphSearch(Eigen::Vector3d start_pt, Eigen::Vector3d end_pt);
+		bool AstarGraphSearch(Eigen::Vector3d start_pt, Eigen::Vector3d end_pt);
 		void resetGrid(GridNodePtr ptr);
 		void resetUsedGrids();
 
-		void initValue(double _resolution, Eigen::Vector3d local_xyz_l,
+		void initGridMap(double _resolution, Eigen::Vector3d local_xyz_l,
                                   Eigen::Vector3d local_xyz_u, Eigen::Vector3d global_xyz_l,
                                   Eigen::Vector3d global_xyz_u,int local_max_x_id,
                                   int local_max_y_id, int local_max_z_id, 
                                   int global_max_x_id, int global_max_y_id, int global_max_z_id);
-		void initGridMap();
 
 		void setObs(const double coord_x, const double coord_y, const double coord_z);
 
@@ -130,6 +180,79 @@ class AstarPathFinder
 			}
 			return flag;
     	}
+
+		//---------------------------
+		void initVisualization(ros::NodeHandle& nh);
+		void visualizeLocalMapBound();
+		void visualizeObstacles();
+		void visualizeVisited();
+		void visualizeStartEndPoints(const Eigen::Vector3d& start_pt, const Eigen::Vector3d& end_pt);
+
+		// // For 2d visualization
+		// void Init2DVisualization() {
+		// 	// 设置可视化参数，考虑局部地图尺寸
+		// 	vis_resolution_ = 50;  // 50 pixels per meter
+		// 	img_width_ = static_cast<int>((lc_xu - lc_xl) * vis_resolution_);
+		// 	img_height_ = static_cast<int>((lc_yu - lc_yl) * vis_resolution_);
+			
+		// 	// 创建窗口
+		// 	cv::namedWindow("A* 2D Visualization", cv::WINDOW_AUTOSIZE);
+    	// }
+
+		// void Update2DVisualization() {
+        // 	// 创建白色背景
+		// 	vis_img_ = cv::Mat(img_height_, img_width_, CV_8UC3, cv::Scalar(255,255,255));
+			
+		// 	// 绘制网格线
+		// 	for(double x = lc_xl; x <= lc_xu; x += resolution) {
+		// 		cv::Point pt1 = World2Img(Eigen::Vector3d(x, lc_yl, 0));
+		// 		cv::Point pt2 = World2Img(Eigen::Vector3d(x, lc_yu, 0));
+		// 		cv::line(vis_img_, pt1, pt2, cv::Scalar(220,220,220), 1);
+		// 	}
+		// 	for(double y = lc_yl; y <= lc_yu; y += resolution) {
+		// 		cv::Point pt1 = World2Img(Eigen::Vector3d(lc_xl, y, 0));
+		// 		cv::Point pt2 = World2Img(Eigen::Vector3d(lc_xu, y, 0));
+		// 		cv::line(vis_img_, pt1, pt2, cv::Scalar(220,220,220), 1);
+		// 	}
+			
+		// 	// 绘制障碍物
+		// 	for(int i = 0; i < GLX_SIZE; i++) {
+		// 		for(int j = 0; j < GLY_SIZE; j++) {
+		// 			if(isOccupied(i, j, GLZ_SIZE/2)) {  // 使用中间高度层作为2D视图
+		// 				Eigen::Vector3d pos = gridIndex2coord(Eigen::Vector3i(i,j,GLZ_SIZE/2));
+		// 				cv::Point pt = World2Img(pos);
+		// 				cv::circle(vis_img_, pt, static_cast<int>(resolution*vis_resolution_/2), cv::Scalar(0,0,0), -1);
+		// 			}
+		// 		}
+		// 	}
+        
+		// 	cv::imshow("A* 2D Visualization", vis_img_);
+		// 	cv::waitKey(1);
+    	// }
+
+		// void Visualize2DNode(const GridNodePtr& node, const cv::Scalar& color) {
+		// 	Eigen::Vector3d pos = gridIndex2coord(node->index);
+		// 	cv::Point pt = World2Img(pos);
+		// 	cv::circle(vis_img_, pt, 2, color, -1);
+			
+		// 	cv::imshow("A* 2D Visualization", vis_img_);
+		// 	cv::waitKey(1);
+		// }
+		
+		// void Visualize2DPath(const std::vector<GridNodePtr>& path, const cv::Scalar& color) {
+		// 	if (path.empty()) return;
+			
+		// 	for(size_t i = 0; i < path.size()-1; i++) {
+		// 		Eigen::Vector3d pos1 = gridIndex2coord(path[i]->index);
+		// 		Eigen::Vector3d pos2 = gridIndex2coord(path[i+1]->index);
+		// 		cv::Point pt1 = World2Img(pos1);
+		// 		cv::Point pt2 = World2Img(pos2);
+		// 		cv::line(vis_img_, pt1, pt2, color, 2);
+		// 	}
+			
+		// 	cv::imshow("A* 2D Visualization", vis_img_);
+		// 	cv::waitKey(1);
+		// }
 
 };
 // init map, reset, setcenter, setObsVector, CheckLineObstacleFree, CheckPathFree, FloydHandle

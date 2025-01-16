@@ -19,8 +19,8 @@
       <remap from="local_pointcloud" to="/pcl_render_node/local_pointcloud"/> 
       <remap from="odom"             to="/visual_slam/odom"/> 
       <remap from="imu"              to="sim/imu"/> 
-      <param name="planning/vel_u"                value="3.0"  />  <!--modified 3.0-->  
-      <param name="planning/vel_l"                value="-3.0"  /> <!--modified 3.0-->
+      <param name="planning/vel_u"                value="1.0"  />  <!--modified 3.0-->  
+      <param name="planning/vel_l"                value="-1.0"  /> <!--modified 3.0-->
       <param name="planning/acc_l"                value="30.0"  /> <!--modified 2.0-->
       <param name="planning/acc_u"                value="-30.0"  /> <!--modified 2.0-->
       <!-- <param name="planning/dev_order"          value="4"    />
@@ -34,7 +34,7 @@
 
       <param name="local_x_size"                  value="2"/>
       <param name="local_y_size"                  value="2"/>
-      <param name="local_z_size"                  value="2"/>
+      <param name="local_z_size"                  value="1"/>
       <!-- <param name="replanning/thresh_replan"    value="1.5" type="double"/> -->
       <!-- <param name="replanning/thresh_no_replan" value="2.0" type="double"/> -->
   </node>
@@ -102,7 +102,7 @@
    <!-- Quadrotor Controller -->  
    <node pkg="nodelet" type="nodelet" args="standalone so3_control/SO3ControlNodelet" name="so3_control" required="true" output="screen">
      <remap from="~odom"          to="/visual_slam/odom"/>
-     <remap from="~position_cmd"  to="/mpc_node/planner_cmd"/> <!--/traj_server/position_command-->
+     <remap from="~position_cmd"  to="planner_cmd"/> <!--/traj_server/position_command or "/mpc_node/planner_cmd"-->
      <remap from="~motors"        to="motors"/>
      <remap from="~corrections"   to="corrections"/>
      <remap from="~so3_cmd"       to="so3_cmd"/>

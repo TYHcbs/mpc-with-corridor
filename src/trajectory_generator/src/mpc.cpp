@@ -11,7 +11,7 @@ bool MPC_Class::Run(void)
     std::cout << "f: " << mpc_.f.rows() << "x" << mpc_.f.cols() << std::endl;
 
     std::cout << "Initial state: " << X_0_.transpose() << std::endl;
-    std::cout << "Reference trajectory first point: " << X_r_.block<9,1>(0,0).transpose() << std::endl;
+    std::cout << " " << X_r_.block<9,1>(0,0).transpose() << std::endl;
 
     // update reference
     LinearTerm(mpc_, X_0_, X_r_);
@@ -90,7 +90,7 @@ bool MPC_Class::Run(void)
     fps_++;
     if (solve_flag == true && init_flag == true) {
         mpc_.u_optimal = solver.getPrimalSol();//modified,origin: solver.getSolution();
-        std::cout<<"**********[Debug!] mpc_.u_optimal: "<<mpc_.u_optimal<<std::endl;
+        // std::cout<<"**********[Debug!] mpc_.u_optimal: "<<mpc_.u_optimal<<std::endl;
         static double vel_max = 0.0;
         if (vel_max < X_0_.block(3,0,3,1).norm()) vel_max = X_0_.block(3,0,3,1).norm();
         if ((ros::Time::now()-print_time_).toSec() > 2.0) {

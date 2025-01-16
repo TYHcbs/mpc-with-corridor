@@ -25,6 +25,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   nav_msgs
   visualization_msgs
+  geometry_msgs
   quadrotor_msgs
   decomp_ros_utils # modified
   # decomp_util # modified
@@ -37,6 +38,7 @@ find_package(Eigen3 REQUIRED)
 find_package(PCL REQUIRED)
 set(Eigen3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})
 find_package(osqp REQUIRED) # selfadded
+# find_package(OpenCV REQUIRED)  # selfadded for 2d visualization a*
 
 catkin_package()
 
@@ -46,7 +48,8 @@ include_directories(
     third_party
   	${catkin_INCLUDE_DIRS}
   	${Eigen3_INCLUDE_DIRS}
-    ${PCL_INCLUDE_DIRS} 
+    ${PCL_INCLUDE_DIRS}
+    # ${OpenCV_INCLUDE_DIRS} 
 )
 
 add_executable(mpc_node
@@ -59,4 +62,5 @@ target_link_libraries(mpc_node
    ${catkin_LIBRARIES}
    ${PCL_LIBRARIES}
    osqp::osqp # selfadded #PUBLIC ?
+   # ${OpenCV_LIBS}
 )

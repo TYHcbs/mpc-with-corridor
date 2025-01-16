@@ -13,7 +13,7 @@ void PlannerClass::TimerCallback(const ros::TimerEvent &)
     ROS_INFO("------------- Timer Callback Start -------------");
     // ROS_INFO("Trying to acquire timer_mutex_...");
     {
-    std::lock_guard<std::mutex> lock(timer_mutex_);
+    // std::lock_guard<std::mutex> lock(timer_mutex_);
     // timer_mutex_.lock();
     ROS_INFO("Successfully acquired timer_mutex_");
     // if (!timer_mutex_.try_lock()) {
@@ -179,7 +179,10 @@ void PlannerClass::TimerCallback(const ros::TimerEvent &)
                 last_p_ref = follow_path_[index];
                 mpc_->SetGoal(follow_path_[index], v_r, Eigen::Vector3d::Zero(), i);
                 mpc_goals_.push_back(follow_path_[index]);
-                std::cout<<"Index: "<< index <<", mpc_goals_.push_back: \n"<<follow_path_[index]<<std::endl;
+                if(i == mpc_->MPC_HORIZON-1){
+                    std::cout<<"Index: "<< index <<", mpc_goals_.push_back: \n"<<follow_path_[index]<<std::endl;
+                }
+                
             }
             AstarPublish(mpc_goals_, 3, 0.1);
 
@@ -223,7 +226,7 @@ void PlannerClass::TimerCallback(const ros::TimerEvent &)
             // std::cout << "[Debug] A1: \n" << A1 << std::endl;
             // std::cout << "[Debug] B1: \n" << B1 <<std::endl;
             // std::cout << "[Debug]index: " << i << ", x_optimal: \n" << x_optimal<< std::endl;
-            // 打印每一步的状态和输入
+            //打印每一步的状态和输入!
             std::cout << "Step " << i << std::endl;
             std::cout << "State: " << x_optimal.transpose() << std::endl;
             std::cout << "Input: " << u_optimal.transpose() << std::endl;
@@ -238,6 +241,7 @@ void PlannerClass::TimerCallback(const ros::TimerEvent &)
         
         // if (!perfect_simu_flag_) CmdPublish(odom_p_, v_optimal, a_optimal, u_optimal);
         // else CmdPublish(p_optimal, v_optimal, a_optimal, u_optimal);//!!!!
+        ROS_WARN("u_optimal FIRST ELEMENT: %3f, %3f, %3f ",u_optimal(0),u_optimal(1),u_optimal(2));
         CmdPublish(p_optimal, v_optimal, a_optimal, u_optimal);//!!!!
         // std::cout<<"[Debug] MPC success, after CmdPublish"<<std::endl;
 
@@ -289,7 +293,7 @@ void PlannerClass::TimerCallback(const ros::TimerEvent &)
     WriteLogTime();
 
     // timer_mutex_.unlock();
-    ROS_INFO("Exiting GoalCallback");
+    ROS_INFO("Exiting TimerCallback");
     }
     // ROS_INFO("Unlocked timer_mutex_");
     ROS_INFO("Timer complete");
@@ -341,6 +345,7 @@ void PlannerClass::GenerateAPolytope(Eigen::Vector3d p1, Eigen::Vector3d p2, Eig
 
 void PlannerClass::PathReplan(bool extend)//!!!会不会少a* init
 {
+    
     std::cout<<"*************In PathReplan, jus start****************"<<std::endl;
     astar_path_.clear();
     waypoints_.clear();
@@ -352,20 +357,22 @@ void PlannerClass::PathReplan(bool extend)//!!!会不会少a* init
     // start_p = odom_p_ + odom_v_ * 0.1;
     // std::cout << "after start_p = odom_p_;" << std::endl;
     if (extend) {
-        // local_astar_->SetCenter(Eigen::Vector3d(odom_p_.x(), odom_p_.y(), 0.0));
+        local_astar_->SetCenter(Eigen::Vector3d(odom_p_.x(), odom_p_.y(), 0.0));
+        ROS_WARN("local_astar_->SetCenter");
         // std::cout << "after local_astar_->SetCenter(xxx)" << std::endl;
         // local_astar_->initGridMap();
-        std::cout << "********************after local_astar_->initGridMap();*****************" << std::endl;
+        std::cout << "after local_astar_->initGridMap();" << std::endl;
     } else {
         // ROS_WARN("[MPC FSM]: Replan!");
         std::cout<<"extend = "<< extend << " (in else)"<<std::endl;
     }
-    std::cout << "*************before local_astar_->setObsVector(local_pc_, expand_dyn_);***************" << std::endl;
+    std::cout << "before local_astar_->setObsVector(local_pc_, expand_dyn_);" << std::endl;
     local_astar_->setObsVector(local_pc_, expand_dyn_);
+    ROS_WARN("local_astar_->setObsVector");
 
     bool add_goal_flag = false;
     end_p = goal_p_;
-    std::cout<<"-------[Debug] end_p before process: \n"<< end_p<< std::endl;
+    std::cout<<"[Debug] end_p before process:"<< end_p(0)<<", "<<end_p(1)<<", " <<end_p(2)<<std::endl;
     // std::cout<<"[YES]******start_p = \n"<<start_p<<"end_p= \n"<<end_p<<std::endl;
     double delta_x = goal_p_.x() - odom_p_.x();
     double delta_y = goal_p_.y() - odom_p_.y();
@@ -433,23 +440,24 @@ void PlannerClass::PathReplan(bool extend)//!!!会不会少a* init
         }
     }
 
-    std::cout<<"***[YES]Start astar search,\nstart_p = "<<start_p.x()<<", "<<start_p.y()<<", "<<start_p.z()<<",\n ----[Debug] end_p After process=\n"<<end_p<<std::endl;
-    local_astar_->AstarGraphSearch(start_p, end_p);
-    bool search_flag = true;
+    ROS_INFO("-----Start astar search-----");
+    ROS_WARN("start_p  = %3f, %3f, %3f",start_p.x(),start_p.y(),start_p.z());
+    ROS_WARN("end_p After process= %3f, %3f, %3f",end_p.x(),end_p.y(),end_p.z());
+    bool search_flag = local_astar_->AstarGraphSearch(start_p, end_p);
     if (search_flag) {
         auto astar_path_ =local_astar_->getPath();
         // std::cout<<"astar_path_ 1st point: "<<astar_path_[0]<<std::endl;
         ROS_INFO("[Debug] astar_path_ after GetPath: total %ld points: ",astar_path_.size());
-        for(int i=0;i<astar_path_.size();i++){
-            std::cout<<astar_path_[i]<<std::endl;
-        }
+        // for(int i=0;i<astar_path_.size();i++){
+        //     std::cout<<astar_path_[i]<<std::endl;
+        // }
         AstarPublish(astar_path_, 0, 0.1);
         std::cout<<"After AstarPublish "<<std::endl;
         waypoints_ =local_astar_->pathSimplify(astar_path_, _path_resolution);
         ROS_INFO("[Debug] waypoints_ after pathSimplify: total %ld points",waypoints_.size());
-        for(int i=0;i<waypoints_.size();i++){
-            std::cout<<waypoints_[i]<<std::endl;
-        }
+        // for(int i=0;i<waypoints_.size();i++){
+        //     std::cout<<waypoints_[i]<<std::endl;
+        // }
         std::cout<<"After pathSimplify "<<std::endl;
         // local_astar_->FloydHandle(astar_path_, waypoints_);//
         // waypoints_.insert(waypoints_.begin(), odom_p_);
@@ -467,9 +475,9 @@ void PlannerClass::PathReplan(bool extend)//!!!会不会少a* init
         }
         follow_path_.push_back(waypoints_.back());
         ROS_INFO("[Debug] follow_path_ after insert points: total %ld points",follow_path_.size());
-        for(int i=0;i<follow_path_.size();i++){
-            std::cout<<follow_path_[i]<<std::endl;
-        }
+        // for(int i=0;i<follow_path_.size();i++){
+        //     std::cout<<follow_path_[i]<<std::endl;
+        // }
 
         std::cout<<"After Insert points, follow_path_ formation done. "<<std::endl;
         AstarPublish(follow_path_, 2, path_dis_);
@@ -493,6 +501,7 @@ void PlannerClass::PathReplan(bool extend)//!!!会不会少a* init
     // local_astar_->initGridMap();
     // std::cout<<"After local_astar_->resetUsedGrids(initGridMap)"<<std::endl;
     // std::cout << "astar reset time is: " << (ros::Time::now() - now).toSec()*1000 << " ms. " << std::endl;
+    
     std::cout<<"****Replan Ended*****"<<std::endl;
 }
 
@@ -522,7 +531,7 @@ void PlannerClass::GoalCallback(const nav_msgs::Path::ConstPtr& msg)// modified,
 
 void PlannerClass::OdomCallback(const nav_msgs::OdometryConstPtr& msg)
 {
-    // ROS_INFO("Recieve odom information");
+    ROS_INFO(" Recieve odom information!. Odom: %f,%f,%f",odom_p_(0),odom_p_(1),odom_p_(2));
     // std::lock_guard<std::mutex> lock(odom_mutex_);
     odom_mutex_.lock();
     odom_time_ = msg->header.stamp;
@@ -554,6 +563,7 @@ void PlannerClass::IMUCallback(const sensor_msgs::ImuConstPtr& msg)
 
 void PlannerClass::LocalPcCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
 {
+    ROS_WARN("----LocalPcCallback----");
     local_pc_mutex_.lock();
     // std::lock_guard<std::mutex> lock(local_pc_mutex_);
 
@@ -584,8 +594,10 @@ void PlannerClass::LocalPcCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
     // update astar map
     static int obs_count = 0;
     local_astar_->SetCenter(Eigen::Vector3d(odom_p_.x(), odom_p_.y(), 0.0));
-    local_astar_->initGridMap();//???huiman
+    ROS_WARN("local_astar_->SetCenter");
+    // local_astar_->initGridMap();//???huiman
     local_astar_->setObsVector(local_pc_, expand_fix_);
+    ROS_WARN("local_astar_->setObsVector");
     std::vector<Eigen::Vector3d> remain_path;
     remain_path.insert(remain_path.begin(), follow_path_.begin()+astar_index_, follow_path_.end());
     if (local_astar_->CheckPathFree(remain_path) == false) replan_flag_ = true;

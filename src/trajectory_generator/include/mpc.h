@@ -59,11 +59,11 @@ public:
             u_last_[i] = Eigen::Vector3d::Zero();
         }
 
-        nh.param("/ipc_node/mpc/R_p",  R_p_, 1000.0);//100
-        nh.param("/ipc_node/mpc/R_v",  R_v_, 10.0);//1
-        nh.param("/ipc_node/mpc/R_a",  R_a_, 1.0);//0
-        nh.param("/ipc_node/mpc/R_u",  R_u_, 0.1);//0
-        nh.param("/ipc_node/mpc/R_u_con",  R_u_con_, 1.0);
+        nh.param("/ipc_node/mpc/R_p",  R_p_, 100.0);//100
+        nh.param("/ipc_node/mpc/R_v",  R_v_, 50.0);//1 //10
+        nh.param("/ipc_node/mpc/R_a",  R_a_, 10.0);//0 //1
+        nh.param("/ipc_node/mpc/R_u",  R_u_, 1.0);//0 //0.1
+        nh.param("/ipc_node/mpc/R_u_con",  R_u_con_, 10.0);
         nh.param("/ipc_node/mpc/R_pN", R_pN_, 100.0);//0
         nh.param("/ipc_node/mpc/R_vN", R_vN_, 10.0); //0
         nh.param("/ipc_node/mpc/R_aN", R_aN_, 1.0); //0
@@ -72,12 +72,12 @@ public:
         nh.param("/ipc_node/mpc/D_y", Drag_(1, 1), 0.0);
         nh.param("/ipc_node/mpc/D_z", Drag_(2, 2), 0.0);
 
-        nh.param("planning/vel_l", v_min_.x(), -3.0);///ipc_node/mpc/vx_min
-        nh.param("planning/vel_l", v_min_.y(), -3.0);
-        nh.param("planning/vel_l", v_min_.z(), -3.0);
-        nh.param("planning/vel_u", v_max_.x(),  3.0);
-        nh.param("planning/vel_u", v_max_.y(),  3.0);
-        nh.param("planning/vel_u", v_max_.z(),  3.0);///ipc_node/mpc/vz_max
+        nh.param("planning/vel_l", v_min_.x(), -1.0);///ipc_node/mpc/vx_min //-3
+        nh.param("planning/vel_l", v_min_.y(), -1.0);
+        nh.param("planning/vel_l", v_min_.z(), -1.0);
+        nh.param("planning/vel_u", v_max_.x(),  1.0);
+        nh.param("planning/vel_u", v_max_.y(),  1.0);
+        nh.param("planning/vel_u", v_max_.z(),  1.0);///ipc_node/mpc/vz_max
 
         nh.param("planning/acc_l", a_min_.x(), -30.0);///ipc_node/mpc/ax_min
         nh.param("planning/acc_l", a_min_.y(), -30.0);
@@ -118,11 +118,11 @@ public:
         x_0.block(pr.rows(), 0, vr.rows(), 1) = vr;
         x_0.block(pr.rows()+vr.rows(), 0, ar.rows(), 1) = ar;
         X_r_.block(x_0.rows()*step, 0, x_0.rows(), 1) = x_0;
-        // 添加debug输出
-        std::cout << "Setting goal for step " << step << ":" << std::endl;
-        std::cout << "Position ref: " << pr.transpose() << std::endl;
-        std::cout << "Velocity ref: " << vr.transpose() << std::endl;
-        std::cout << "Acceleration ref: " << ar.transpose() << std::endl;
+        // 添加debug输出!
+        // std::cout << "Setting goal for step " << step << ":" << std::endl;
+        // std::cout << "Position ref: " << pr.transpose() << std::endl;
+        // std::cout << "Velocity ref: " << vr.transpose() << std::endl;
+        // std::cout << "Acceleration ref: " << ar.transpose() << std::endl;
     }
     void SetStatus(Eigen::Vector3d p0, Eigen::Vector3d v0, Eigen::Vector3d a0) {
         StatusSaturation(v0, a0);

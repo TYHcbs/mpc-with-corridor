@@ -22,10 +22,10 @@ struct GridNode
     GridNodePtr cameFrom;
     std::multimap<double, GridNodePtr>::iterator nodeMapIt;
 
-    GridNode(Eigen::Vector3i _index, Eigen::Vector3d _coord){  
+    GridNode(Eigen::Vector3i _index){  //modified,origin: GridNode(Eigen::Vector3i _index, Eigen::Vector3d _coord)
 		id = 0;
 		index = _index;
-		coord = _coord;
+		// coord = _coord;
 		dir   = Eigen::Vector3i::Zero();
 
 		gScore = INF;
